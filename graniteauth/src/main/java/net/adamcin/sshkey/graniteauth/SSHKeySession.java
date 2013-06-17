@@ -10,16 +10,12 @@ public final class SSHKeySession {
     private final Challenge challenge;
     private final String username;
     private final String remoteAddr;
-    private final String serverName;
-    private final int serverPort;
     private final long timestamp;
 
-    private SSHKeySession(Challenge challenge, String username, HttpServletRequest request, long timestamp) {
+    private SSHKeySession(Challenge challenge, String username, String remoteAddr, long timestamp) {
         this.challenge = challenge;
         this.username = username;
-        this.remoteAddr = request.getRemoteAddr();
-        this.serverName = request.getServerName();
-        this.serverPort = request.getServerPort();
+        this.remoteAddr = remoteAddr;
         this.timestamp = timestamp;
     }
 
@@ -36,27 +32,48 @@ public final class SSHKeySession {
     }
 
     public boolean validateRequest(HttpServletRequest request, long maxAge) {
-        return (System.currentTimeMillis() <= maxAge + this.timestamp) && this.remoteAddr.equals(request.getRemoteAddr())
-                && this.serverName.equals(request.getServerName())
-                && this.serverPort == request.getServerPort();
+        return (System.currentTimeMillis() <= maxAge + this.timestamp)
+                && this.remoteAddr.equals(getRemoteAddr(request))
+                && this.challenge.getHost().equals(getHost(request))
+                && this.challenge.getUserAgent().equals(getUserAgent(request));
     }
 
-    public static final SSHKeySession createSession(CryptoSupport cryptoSupport,
+    private static String getHost(HttpServletRequest request) {
+        return request.getHeader("Host") != null ? request.getHeader("Host") : "";
+    }
+
+    private static String getUserAgent(HttpServletRequest request) {
+        return request.getHeader("User-Agent") != null ? request.getHeader("User-Agent") : "";
+    }
+
+    private static String getRemoteAddr(HttpServletRequest request) {
+        return request.getRemoteAddr();
+    }
+
+    public static SSHKeySession createSession(CryptoSupport cryptoSupport,
                                                     String username,
                                                     String fingerprint,
                                                     String realm,
                                                     HttpServletRequest request) throws
                                                                                                                                                                 CryptoException {
-        String remoteAddr = request.getRemoteAddr();
-        String serverName = request.getServerName();
-        int serverPort = request.getServerPort();
+        String remoteAddr = getRemoteAddr(request);
+        String host = getHost(request);
+        String userAgent = getUserAgent(request);
         Long timestamp = System.currentTimeMillis();
-        String raw = new StringBuilder(username).append(fingerprint).append(realm)
-                .append(remoteAddr).append(serverName).append(serverPort)
-                .append(timestamp).toString();
-        String encrypted = cryptoSupport.protect(raw);
-        String sessionId = encrypted.substring(1, encrypted.length() - 1);
-        Challenge challenge = new Challenge(realm, fingerprint, sessionId);
-        return new SSHKeySession(challenge, username, request, timestamp);
+
+        StringBuilder raw = new StringBuilder();
+        raw.append(username)
+                .append(fingerprint)
+                .append(realm)
+                .append(remoteAddr)
+                .append(host)
+                .append(userAgent)
+                .append(timestamp);
+
+        String encrypted = cryptoSupport.protect(raw.toString());
+        String token = encrypted.substring(1, encrypted.length() - 1);
+        Challenge challenge = new Challenge(realm, fingerprint, token, host, userAgent);
+
+        return new SSHKeySession(challenge, username, remoteAddr, timestamp);
     }
 }

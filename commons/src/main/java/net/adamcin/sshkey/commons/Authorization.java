@@ -2,16 +2,16 @@ package net.adamcin.sshkey.commons;
 
 public final class Authorization {
 
-    private final String sessionId;
+    private final String token;
     private final String signature;
 
-    public Authorization(String sessionId, String signature) {
-        this.sessionId = sessionId;
+    public Authorization(String token, String signature) {
+        this.token = token;
         this.signature = signature;
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public String getToken() {
+        return token;
     }
 
     public String getSignature() {
@@ -20,7 +20,7 @@ public final class Authorization {
 
     @Override
     public String toString() {
-        return Constants.SCHEME + " " + sessionId + " " + signature;
+        return Constants.SCHEME + " " + token + " " + signature;
     }
 
     public static Authorization parse(String header) {
@@ -34,9 +34,9 @@ public final class Authorization {
             return null;
         }
 
-        String sessionId = parts[1];
+        String token = parts[1];
         String signature = parts[2];
 
-        return new Authorization(sessionId, signature);
+        return new Authorization(token, signature);
     }
 }

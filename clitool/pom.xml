@@ -78,6 +78,7 @@
             <plugin>
                 <groupId>net.adamcin</groupId>
                 <artifactId>vltpack-maven-plugin</artifactId>
+                <!--
                 <executions>
                     <execution>
                         <id>auto-deploy-bundle</id>
@@ -86,6 +87,7 @@
                         </goals>
                     </execution>
                 </executions>
+                -->
             </plugin>
             <plugin>
                 <groupId>com.github.github</groupId>

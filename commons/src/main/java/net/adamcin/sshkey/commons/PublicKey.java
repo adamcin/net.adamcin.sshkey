@@ -24,14 +24,14 @@ abstract class PublicKey {
     protected PublicKey(String format, String encodedKey) {
         this.format = format;
         this.encodedKey = encodedKey;
-        this.key = Base64.decodeBase64(encodedKey);
+        this.key = Util.fromBase64(encodedKey);
     }
 
-    public boolean verify(Authorization packet) throws Exception {
+    public boolean verify(Challenge challenge, Authorization packet) throws Exception {
         if (packet != null) {
             Signature sig = this.getSignature();
-            sig.update(packet.toString().getBytes());
-            return sig.verify(Base64.decodeBase64(packet.getSignature()));
+            sig.update(challenge.getHash());
+            return sig.verify(Util.fromBase64(packet.getSignature()));
         }
         return false;
     }
@@ -86,10 +86,10 @@ abstract class PublicKey {
     }
 
     public static PublicKey createKey(String format, String encodedKey) {
-        if ("ssh-dss".equals(format)) {
-            //keys.add(new );
-        } else if (RSAPublicKey.FORMAT.equals(format)) {
-            return new RSAPublicKey(format, encodedKey);
+        if (PublicKeyDSA.FORMAT.equals(format)) {
+            return new PublicKeyDSA(format, encodedKey);
+        } else if (PublicKeyRSA.FORMAT.equals(format)) {
+            return new PublicKeyRSA(format, encodedKey);
         }
 
         return null;

@@ -160,18 +160,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
     protected boolean forceAuthentication(HttpServletRequest request,
                                           HttpServletResponse response) {
 
-        boolean authenticationForced = false;
-        if (request.getParameter(SLING_AUTH_REQUEST_LOGIN) != null
-                && request.getAttribute(TokenCookie.class.getName()) == null) {
-            String username = getSSHKeyUsername(request);
-            if (username != null) {
-                if (!response.isCommitted()) {
-                    authenticationForced = sendUnauthorized(username, request, response);
-                }
-            }
-        }
-
-        return authenticationForced;
+        return sendChallenge(request, response);
     }
 
     protected String selectFingerprint(String username, HttpServletRequest request) {
@@ -186,13 +175,22 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
         return verifier.selectFingerprint(_fingerprints);
     }
 
-    protected boolean sendUnauthorized(String username, HttpServletRequest request,
-                                          HttpServletResponse response) {
+    protected boolean sendChallenge(HttpServletRequest request,
+                                    HttpServletResponse response) {
         if (response.isCommitted()) {
             return false;
         }
 
+        String username = getSSHKeyUsername(request);
+        if (username == null) {
+            return false;
+        }
+
         String fingerprint = selectFingerprint(username, request);
+        if (fingerprint == null) {
+            return false;
+        }
+
         SSHKeySession session = createSession(username, fingerprint, request);
 
         if (session != null) {
@@ -204,7 +202,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
                 response.flushBuffer();
                 return true;
             } catch (IOException e) {
-                LOGGER.error("Failed to send WWW-Authenticate header", e);
+                LOGGER.error("[sendChallenge] Failed to send challenge", e);
             }
         }
 
@@ -216,7 +214,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
             try {
                 SSHKeySession session = SSHKeySession.createSession(cryptoSupport, username, fingerprint, realm, request);
                 synchronized (this.sessions) {
-                    this.sessions.put(session.getChallenge().getSessionId(), session);
+                    this.sessions.put(session.getChallenge().getToken(), session);
                 }
                 return session;
             } catch (CryptoException e) {
@@ -226,10 +224,10 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
         return null;
     }
 
-    protected SSHKeySession validateSession(HttpServletRequest request, String sessionId) {
-        if (this.sessions.containsKey(sessionId)) {
+    protected SSHKeySession validateSession(HttpServletRequest request, String token) {
+        if (this.sessions.containsKey(token)) {
             synchronized (this.sessions) {
-                SSHKeySession session = this.sessions.remove(sessionId);
+                SSHKeySession session = this.sessions.remove(token);
                 if (session != null && session.validateRequest(request, 60L * 1000L)) {
                     return session;
                 }
@@ -270,10 +268,10 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
 
         AuthenticationInfo info = null;
 
-        SSHKeySession session = validateSession(request, authorization.getSessionId());
+        SSHKeySession session = validateSession(request, authorization.getToken());
 
         try {
-            boolean signatureValid = verifier.verify(session.getChallenge(), authorization);
+            boolean signatureValid = session != null && verifier.verify(session.getChallenge(), authorization);
             if (signatureValid) {
                 if (request.getAttribute(TokenCookie.class.getName()) != null) {
                     request.setAttribute(TokenCookie.class.getName(), null);

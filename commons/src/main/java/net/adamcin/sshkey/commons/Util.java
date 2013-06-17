@@ -5,7 +5,7 @@ import com.jcraft.jsch.jce.MD5;
 import org.apache.commons.codec.binary.Base64;
 
 final class Util {
-    private static String[] fingerPrintChars = {
+    private static final String[] fingerPrintChars = {
             "0","1","2","3","4","5","6","7","8","9", "a","b","c","d","e","f"
     };
 
@@ -14,7 +14,7 @@ final class Util {
     }
 
     public static byte[] fromBase64(String encoded) {
-        return Base64.decodeBase64(encoded);
+        return Base64.decodeBase64(encoded.getBytes(Constants.CHARSET));
     }
 
     /**

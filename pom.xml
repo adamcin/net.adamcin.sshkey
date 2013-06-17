@@ -41,7 +41,7 @@
     <packaging>pom</packaging>
 
     <inceptionYear>2013</inceptionYear>
-    <name>Recap</name>
+    <name>SSHKey</name>
     <description>Reference implementation of an SSH Key HTTP Authentication Scheme</description>
     <url>http://adamcin.net/net.adamcin.sshkey</url>
 

@@ -76,8 +76,6 @@
                             *
                         </Import-Package>
 						<Embed-Dependency>
-                            net.adamcin.sshkey.commons,
-                            jsch,
                             org.apache.sling.commons.osgi
                         </Embed-Dependency>
                     </instructions>

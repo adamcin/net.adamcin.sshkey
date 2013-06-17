@@ -64,9 +64,8 @@ public final class Signer {
             }
 
             if (identity != null) {
-                String sessionId = challenge.getSessionId();
-                String signature = Util.toBase64(identity.getSignature(sessionId.getBytes()));
-                return new Authorization(sessionId, signature);
+                String signature = Util.toBase64(identity.getSignature(challenge.getHash()));
+                return new Authorization(challenge.getToken(), signature);
             }
         }
 

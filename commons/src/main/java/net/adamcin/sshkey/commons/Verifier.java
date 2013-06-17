@@ -6,12 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public final class Verifier {
 
@@ -70,7 +67,7 @@ public final class Verifier {
 
         if (key != null) {
             try {
-                return key.verify(authorization);
+                return key.verify(challenge, authorization);
             } catch (Exception e) {
                 throw new VerifierException("Failed to verify signature", e);
             }

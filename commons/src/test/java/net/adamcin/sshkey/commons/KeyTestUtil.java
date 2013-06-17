@@ -12,7 +12,7 @@ import java.io.OutputStream;
 /**
  *
  */
-public class SSHKeyTestUtil {
+public class KeyTestUtil {
 
     private static final File TEST_TEMP = new File("target/test-temp");
     static {
@@ -27,19 +27,19 @@ public class SSHKeyTestUtil {
         return getResourceAsFile("/authorized_keys");
     }
 
-    public static File getPrivateKeyAsFile(String parentName) {
-        return getResourceAsFile("/" + parentName + "/id_rsa");
+    public static File getPrivateKeyAsFile(String parentName, String keyName) {
+        return getResourceAsFile("/" + parentName + "/" + keyName);
     }
 
-    public static File getPublicKeyAsFile(String parentName) {
-        return getResourceAsFile("/" + parentName + "/id_rsa.pub");
+    public static File getPublicKeyAsFile(String parentName, String keyName) {
+        return getResourceAsFile("/" + parentName + "/" + keyName + ".pub");
     }
 
     private static File getResourceAsFile(String name) {
         InputStream is = null;
         OutputStream os = null;
         try {
-            is = SSHKeyTestUtil.class.getResourceAsStream(name);
+            is = KeyTestUtil.class.getResourceAsStream(name);
             File temp = File.createTempFile("sshkeytest", ".tmp", TEST_TEMP);
             os = new FileOutputStream(temp);
             IOUtils.copy(is, os);

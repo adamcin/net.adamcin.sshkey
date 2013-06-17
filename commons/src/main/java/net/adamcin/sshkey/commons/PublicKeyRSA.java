@@ -6,11 +6,11 @@ import com.jcraft.jsch.jce.SignatureRSA;
 
 import java.util.Arrays;
 
-final class RSAPublicKey extends PublicKey {
+final class PublicKeyRSA extends PublicKey {
 
     public static final String FORMAT = "ssh-rsa";
 
-    public RSAPublicKey(String format, String encodedKey) {
+    public PublicKeyRSA(String format, String encodedKey) {
         super(format, encodedKey);
     }
 
@@ -22,19 +22,19 @@ final class RSAPublicKey extends PublicKey {
 
         signature.init();
         buf.getString(); // read the format string first
-        byte[] e = buf.getMPInt();
-        byte[] n = buf.getMPInt();
+        byte[] e = buf.getString();
+        byte[] n = buf.getString();
         signature.setPubKey(e, n);
         return signature;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof RSAPublicKey)) {
+        if (!(obj instanceof PublicKeyRSA)) {
             return false;
         }
 
-        RSAPublicKey otherKey = (RSAPublicKey) obj;
+        PublicKeyRSA otherKey = (PublicKeyRSA) obj;
 
         return Arrays.equals(this.key, otherKey.key);
     }
