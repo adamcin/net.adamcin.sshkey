@@ -197,6 +197,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
             response.reset();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setHeader(Constants.HEADER_CHALLENGE, session.getChallenge().toString());
+            LOGGER.error("[sendChallenge] challengeHash={}", new String(session.getChallenge().getHash()));
 
             try {
                 response.flushBuffer();

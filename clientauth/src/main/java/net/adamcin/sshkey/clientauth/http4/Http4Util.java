@@ -2,14 +2,18 @@ package net.adamcin.sshkey.clientauth.http4;
 
 import net.adamcin.sshkey.commons.Constants;
 import net.adamcin.sshkey.commons.Signer;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.http.auth.AuthScheme;
 import org.apache.http.auth.AuthSchemeFactory;
 import org.apache.http.auth.params.AuthPNames;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 public final class Http4Util {
@@ -25,7 +29,7 @@ public final class Http4Util {
 
         client.getAuthSchemes().register(Constants.SCHEME, new AuthSchemeFactory() {
             public AuthScheme newInstance(HttpParams params) {
-                return new Http4SSHKeyAuthScheme(signer, params);
+                return new Http4SSHKeyAuthScheme(signer);
             }
         });
 
@@ -35,7 +39,7 @@ public final class Http4Util {
         HttpClientParams.setAuthenticating(client.getParams(), true);
     }
 
-    public static void setHeaders(HttpUriRequest request, String username, Signer signer) {
+    public static void setHeaders(HttpUriRequest request, Signer signer, String username) {
         if (request != null) {
 
             request.removeHeaders(Constants.HEADER_X_SSHKEY_USERNAME);
@@ -50,6 +54,17 @@ public final class Http4Util {
                 }
             }
         }
+    }
+
+    public static boolean login(String loginUri, Signer signer, String username, int expectStatus,
+                                AbstractHttpClient client,
+                                HttpContext context)
+            throws IOException {
+
+        enableAuth(signer, client);
+        HttpUriRequest request = new HttpGet(loginUri);
+        setHeaders(request, signer, username);
+        return client.execute(request, context).getStatusLine().getStatusCode() == expectStatus;
     }
 
     private Http4Util() {

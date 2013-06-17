@@ -6,19 +6,14 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.CredentialsProvider;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.DefaultHttpParams;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Created with IntelliJ IDEA.
- * User: madamcin
- * Date: 6/15/13
- * Time: 7:55 PM
- * To change this template use File | Settings | File Templates.
- */
 public final class Http3Util {
 
     public static void enableAuth(Signer signer, HttpClient client) {
@@ -58,6 +53,16 @@ public final class Http3Util {
                 }
             }
         }
+    }
+
+    public static boolean login(String loginUri, Signer signer, String username, int expectStatus,
+                                HttpClient client)
+            throws IOException {
+
+        enableAuth(signer, client);
+        GetMethod method = new GetMethod(loginUri);
+        setHeaders(method, username, signer);
+        return expectStatus == client.executeMethod(method);
     }
 
 

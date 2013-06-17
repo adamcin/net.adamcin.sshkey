@@ -11,16 +11,12 @@ import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.Credentials;
 import org.apache.http.impl.auth.RFC2617Scheme;
 import org.apache.http.message.BasicHeader;
-import org.apache.http.params.HttpParams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class Http4SSHKeyAuthScheme extends RFC2617Scheme {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Http4SSHKeyAuthScheme.class);
 
     private Signer signer;
 
-    public Http4SSHKeyAuthScheme(Signer signer, HttpParams httpParams) {
+    public Http4SSHKeyAuthScheme(Signer signer) {
         this.signer = signer;
     }
 
@@ -42,8 +38,8 @@ public final class Http4SSHKeyAuthScheme extends RFC2617Scheme {
         String fingerprint = this.getParameter(Constants.CHALLENGE_PARAM_FINGERPRINT);
         String token = this.getParameter(Constants.CHALLENGE_PARAM_TOKEN);
 
-        Header hostHeader = request.getFirstHeader("Host");
-        Header userAgentHeader = request.getFirstHeader("User-Agent");
+        Header hostHeader = request.getFirstHeader(Constants.HEADER_HOST);
+        Header userAgentHeader = request.getFirstHeader(Constants.HEADER_USER_AGENT);
         String host = hostHeader != null ? hostHeader.getValue() : "";
         String userAgent = userAgentHeader != null ? userAgentHeader.getValue() : "";
 

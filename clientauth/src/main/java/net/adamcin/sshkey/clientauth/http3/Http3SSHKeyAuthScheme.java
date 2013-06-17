@@ -36,8 +36,8 @@ public final class Http3SSHKeyAuthScheme extends RFC2617Scheme {
             String fingerprint = this.getParameter(Constants.CHALLENGE_PARAM_FINGERPRINT);
             String sessionId = this.getParameter(Constants.CHALLENGE_PARAM_TOKEN);
 
-            Header hostHeader = method.getRequestHeader("Host");
-            Header userAgentHeader = method.getRequestHeader("User-Agent");
+            Header hostHeader = method.getRequestHeader(Constants.HEADER_HOST);
+            Header userAgentHeader = method.getRequestHeader(Constants.HEADER_USER_AGENT);
             String host = hostHeader != null ? hostHeader.getValue() : "";
             String userAgent = userAgentHeader != null ? userAgentHeader.getValue() : "";
 

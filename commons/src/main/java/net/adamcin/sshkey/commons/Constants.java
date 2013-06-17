@@ -10,6 +10,10 @@ public final class Constants {
 
     public static final String HEADER_AUTHORIZATION = "Authorization";
 
+    public static final String HEADER_HOST = "Host";
+
+    public static final String HEADER_USER_AGENT = "User-Agent";
+
     public static final String HEADER_X_SSHKEY_USERNAME = "X-SSHKey-Username";
 
     public static final String HEADER_X_SSHKEY_FINGERPRINT = "X-SSHKey-Fingerprint";

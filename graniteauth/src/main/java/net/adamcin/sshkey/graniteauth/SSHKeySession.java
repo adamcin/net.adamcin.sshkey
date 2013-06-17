@@ -3,6 +3,7 @@ package net.adamcin.sshkey.graniteauth;
 import com.adobe.granite.crypto.CryptoException;
 import com.adobe.granite.crypto.CryptoSupport;
 import net.adamcin.sshkey.commons.Challenge;
+import net.adamcin.sshkey.commons.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,11 +40,12 @@ public final class SSHKeySession {
     }
 
     private static String getHost(HttpServletRequest request) {
-        return request.getHeader("Host") != null ? request.getHeader("Host") : "";
+        return request.getHeader(Constants.HEADER_HOST) != null ? request.getHeader(Constants.HEADER_HOST) : "";
     }
 
     private static String getUserAgent(HttpServletRequest request) {
-        return request.getHeader("User-Agent") != null ? request.getHeader("User-Agent") : "";
+        return request.getHeader(Constants.HEADER_USER_AGENT) != null ?
+                request.getHeader(Constants.HEADER_USER_AGENT) : "";
     }
 
     private static String getRemoteAddr(HttpServletRequest request) {

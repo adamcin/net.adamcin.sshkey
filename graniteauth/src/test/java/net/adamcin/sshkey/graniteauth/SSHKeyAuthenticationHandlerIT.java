@@ -8,7 +8,6 @@ import net.adamcin.commons.testing.sling.VltpackITContext;
 import net.adamcin.sshkey.clientauth.http4.Http4Util;
 import net.adamcin.sshkey.commons.Signer;
 import net.adamcin.sshkey.commons.SignerException;
-import org.apache.http.HttpResponse;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.sling.testing.tools.http.Request;
 import org.apache.sling.testing.tools.http.RequestBuilder;
@@ -39,7 +38,7 @@ public class SSHKeyAuthenticationHandlerIT {
                     Http4Util.enableAuth(signer, client);
                     RequestCustomizer customizer = new RequestCustomizer() {
                         public void customizeRequest(Request r) {
-                            Http4Util.setHeaders(r.getRequest(), "admin", signer);
+                            Http4Util.setHeaders(r.getRequest(), signer, "admin");
                         }
                     };
 

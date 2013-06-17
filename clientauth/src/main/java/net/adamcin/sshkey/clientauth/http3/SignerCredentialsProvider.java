@@ -7,13 +7,6 @@ import org.apache.commons.httpclient.auth.AuthScheme;
 import org.apache.commons.httpclient.auth.CredentialsNotAvailableException;
 import org.apache.commons.httpclient.auth.CredentialsProvider;
 
-/**
- * Created with IntelliJ IDEA.
- * User: madamcin
- * Date: 6/15/13
- * Time: 8:29 PM
- * To change this template use File | Settings | File Templates.
- */
 public final class SignerCredentialsProvider implements CredentialsProvider {
 
     private final Signer signer;
