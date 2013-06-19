@@ -28,7 +28,7 @@ public class AsyncUtilIT {
 
                 AsyncHttpClient client = new AsyncHttpClient();
 
-                assertTrue("logged in", AsyncUtil.login("http://localhost:4502/index.html", signer, "admin", 200, client, true, 60000));
+                assertTrue("logged in", AsyncUtil.login("http://localhost:4502/index.html", signer, "admin", client, true, 60000).getStatusCode() == 200);
 
             }
         });

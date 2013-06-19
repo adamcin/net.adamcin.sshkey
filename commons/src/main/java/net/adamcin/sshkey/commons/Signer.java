@@ -38,7 +38,18 @@ public final class Signer {
         }
     }
 
+    public synchronized void addLocalKey(String name, byte[] keyBlob, byte[] passphrase) throws SignerException {
+        try {
+            this.jSch.addIdentity(name, keyBlob, null, passphrase);
+
+            reloadIdentities();
+        } catch (JSchException e) {
+            throw new SignerException("Failed to add identity", e);
+        }
+    }
+
     private synchronized void reloadIdentities() throws SignerException {
+
         identities.clear();
 
         Vector _identities = jSch.getIdentityRepository().getIdentities();
@@ -72,12 +83,12 @@ public final class Signer {
         return null;
     }
 
-    public synchronized void clear() throws VerifierException {
+    public synchronized void clear() throws SignerException {
         identities.clear();
         try {
             this.jSch.removeAllIdentity();
         } catch (JSchException e) {
-            throw new VerifierException("Failed to remove all identities", e);
+            throw new SignerException("Failed to remove all identities", e);
         }
     }
 }

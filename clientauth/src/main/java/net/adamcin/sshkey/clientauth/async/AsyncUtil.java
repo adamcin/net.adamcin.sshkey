@@ -61,7 +61,7 @@ public final class AsyncUtil {
         }
     }
 
-    public static boolean login(final String loginUri, final Signer signer, final String username, final int expectStatus,
+    public static Response login(final String loginUri, final Signer signer, final String username,
                                 final AsyncHttpClient client, final boolean checkTimeout, final long timeoutRemaining)
             throws IOException {
 
@@ -86,7 +86,7 @@ public final class AsyncUtil {
                     if (challenge != null) {
                         Authorization authorization = signer.sign(challenge);
                         if (authorization != null) {
-                            Request authRequest = client.prepareGet(loginUri).setFollowRedirects(true).addHeader(
+                            Request authRequest = client.prepareGet(loginUri).setFollowRedirects(false).addHeader(
                                     Constants.HEADER_AUTHORIZATION,
                                     authorization.toString()
                             ).build();
@@ -111,9 +111,9 @@ public final class AsyncUtil {
 
         try {
             if (checkTimeout) {
-                return future.get(timeoutRemaining, TimeUnit.MILLISECONDS).getStatusCode() == expectStatus;
+                return future.get(timeoutRemaining, TimeUnit.MILLISECONDS);
             } else {
-                return future.get().getStatusCode() == expectStatus;
+                return future.get();
             }
         } catch (TimeoutException e) {
             throw new IOException("timeout exceeded");
