@@ -75,9 +75,7 @@
                             com.jcraft.*;resolution:=optional,
                             *
                         </Import-Package>
-                        <Embed-Dependency>
-                            jsch
-                        </Embed-Dependency>
+                        <Embed-Dependency>jsch</Embed-Dependency>
                     </instructions>
 					<obrRepository>false</obrRepository>
                 </configuration>

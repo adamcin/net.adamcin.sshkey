@@ -73,17 +73,11 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
     private String authorizedKeysPath;
     private String realm;
 
-    private final Verifier verifier = new Verifier();
     private final Map<String, SSHKeySession> sessions = Collections.synchronizedMap(new HashMap<String, SSHKeySession>());
 
     @Activate
     protected void activate(ComponentContext ctx, Map<String, Object> props) {
         this.authorizedKeysPath = PropertiesUtil.toString(props.get(OSGI_AUTH_KEYS_PATH), "");
-        try {
-            verifier.readAuthorizedKeys(getAuthorizedKeysFile());
-        } catch (VerifierException e) {
-            LOGGER.error("[activate] Failed to read authorized_keys file", e);
-        }
 
         this.realm = PropertiesUtil.toString(props.get(OSGI_REALM), DEFAULT_REALM);
     }
@@ -92,7 +86,6 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
     protected void deactivate(ComponentContext ctx) {
         this.authorizedKeysPath = null;
         this.realm = null;
-        verifier.clear();
 
         synchronized (sessions) {
             sessions.clear();
@@ -101,6 +94,16 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
 
     protected boolean isAllowedToLogin(HttpServletRequest request) {
         return true;
+    }
+
+    protected Verifier getVerifier() {
+        Verifier verifier = new Verifier();
+        try {
+            verifier.readAuthorizedKeys(getAuthorizedKeysFile());
+        } catch (VerifierException e) {
+            LOGGER.error("[activate] Failed to read authorized_keys file", e);
+        }
+        return verifier;
     }
 
     protected File getAuthorizedKeysFile() {
@@ -172,7 +175,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
                 _fingerprints.add(fingerprint);
             }
         }
-        return verifier.selectFingerprint(_fingerprints);
+        return getVerifier().selectFingerprint(_fingerprints);
     }
 
     protected boolean sendChallenge(HttpServletRequest request,
@@ -272,7 +275,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
         SSHKeySession session = validateSession(request, authorization.getToken());
 
         try {
-            boolean signatureValid = session != null && verifier.verify(session.getChallenge(), authorization);
+            boolean signatureValid = session != null && getVerifier().verify(session.getChallenge(), authorization);
             if (signatureValid) {
                 if (request.getAttribute(TokenCookie.class.getName()) != null) {
                     request.setAttribute(TokenCookie.class.getName(), null);

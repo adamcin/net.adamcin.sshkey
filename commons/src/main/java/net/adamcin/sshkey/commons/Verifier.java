@@ -14,7 +14,7 @@ public final class Verifier {
 
     private Map<String, PublicKey> authorizedKeys = new HashMap<String, PublicKey>();
 
-    public synchronized String selectFingerprint(Collection<String> clientFingerprints) {
+    public String selectFingerprint(Collection<String> clientFingerprints) {
         if (clientFingerprints != null) {
             for (String clientFingerprint : clientFingerprints) {
                 if (authorizedKeys.containsKey(clientFingerprint)) {
@@ -39,9 +39,7 @@ public final class Verifier {
                     }
                     _keys.put(key.getFingerprint(), key);
                 }
-                synchronized (this) {
-                    authorizedKeys.putAll(_keys);
-                }
+                authorizedKeys.putAll(_keys);
             } catch (IOException e) {
                 throw new VerifierException("Failed to read authorized_keys file: "
                                                     + authorizedKeysFile.getAbsolutePath(), e);
@@ -61,9 +59,7 @@ public final class Verifier {
         }
 
         PublicKey key = null;
-        synchronized (this) {
-            key = authorizedKeys.get(challenge.getFingerprint());
-        }
+        key = authorizedKeys.get(challenge.getFingerprint());
 
         if (key != null) {
             try {
@@ -75,7 +71,7 @@ public final class Verifier {
         return false;
     }
 
-    public synchronized void clear() {
+    public void clear() {
         this.authorizedKeys.clear();
     }
 }

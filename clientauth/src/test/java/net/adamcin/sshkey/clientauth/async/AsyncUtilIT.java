@@ -1,6 +1,8 @@
 package net.adamcin.sshkey.clientauth.async;
 
+import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Response;
 import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.sshkey.clientauth.KeyTestUtil;
 import net.adamcin.sshkey.commons.Signer;
@@ -12,6 +14,11 @@ import static org.junit.Assert.*;
 
 public class AsyncUtilIT {
 
+    private static final RequestBuilderDecorator FOLLOW_REDIRECTS_DECORATOR = new RequestBuilderDecorator() {
+        public AsyncHttpClient.BoundRequestBuilder decorate(AsyncHttpClient.BoundRequestBuilder builder) {
+            return builder.setFollowRedirects(true);
+        }
+    };
 
     @Test
     public void testLogin() {
@@ -28,7 +35,12 @@ public class AsyncUtilIT {
 
                 AsyncHttpClient client = new AsyncHttpClient();
 
-                assertTrue("logged in", AsyncUtil.login("http://localhost:4502/index.html", signer, "admin", client, true, 60000).getStatusCode() == 200);
+                assertTrue("logged in", AsyncUtil.login("http://localhost:4502/index.html", signer, "admin", client, true, 60000, new AsyncCompletionHandler<Boolean>() {
+                    @Override
+                    public Boolean onCompleted(Response response) throws Exception {
+                        return response.getStatusCode() == 200;
+                    }
+                }, FOLLOW_REDIRECTS_DECORATOR));
 
             }
         });

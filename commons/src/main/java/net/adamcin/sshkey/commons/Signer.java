@@ -17,14 +17,11 @@ public final class Signer {
     private final Map<String, Identity> identities = new HashMap<String, Identity>();
 
     public Set<String> getFingerprints() {
-        Set<String> keySet = null;
-        synchronized (this) {
-            keySet = identities.keySet();
-        }
+        Set<String> keySet = identities.keySet();
         return Collections.unmodifiableSet(new HashSet<String>(keySet));
     }
 
-    public synchronized void addLocalKey(String path, String passphrase) throws SignerException {
+    public void addLocalKey(String path, String passphrase) throws SignerException {
         try {
             if (passphrase != null) {
                 this.jSch.addIdentity(path, passphrase);
@@ -38,7 +35,7 @@ public final class Signer {
         }
     }
 
-    public synchronized void addLocalKey(String name, byte[] keyBlob, byte[] passphrase) throws SignerException {
+    public void addLocalKey(String name, byte[] keyBlob, byte[] passphrase) throws SignerException {
         try {
             this.jSch.addIdentity(name, keyBlob, null, passphrase);
 
@@ -48,7 +45,7 @@ public final class Signer {
         }
     }
 
-    private synchronized void reloadIdentities() throws SignerException {
+    private void reloadIdentities() throws SignerException {
 
         identities.clear();
 
@@ -70,9 +67,7 @@ public final class Signer {
         if (challenge != null) {
             Identity identity = null;
 
-            synchronized (this) {
-                identity = this.identities.get(challenge.getFingerprint());
-            }
+            identity = this.identities.get(challenge.getFingerprint());
 
             if (identity != null) {
                 String signature = Util.toBase64(identity.getSignature(challenge.getHash()));
@@ -83,7 +78,7 @@ public final class Signer {
         return null;
     }
 
-    public synchronized void clear() throws SignerException {
+    public void clear() throws SignerException {
         identities.clear();
         try {
             this.jSch.removeAllIdentity();
