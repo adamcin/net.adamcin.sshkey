@@ -14,7 +14,10 @@ import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.apache.felix.webconsole.WebConsoleSecurityProvider;
+import org.apache.felix.webconsole.WebConsoleSecurityProvider2;
 import org.apache.sling.auth.core.spi.AbstractAuthenticationHandler;
+import org.apache.sling.auth.core.spi.AuthenticationHandler;
 import org.apache.sling.auth.core.spi.AuthenticationInfo;
 import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.apache.sling.jcr.api.SlingRepository;
@@ -68,6 +71,9 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
 
     @Reference
     private CryptoSupport cryptoSupport;
+
+    //@Reference(target = "(component.name=com.day.crx.security.token.impl.impl.TokenAuthenticationHandler)")
+    //private AuthenticationHandler tokenHandler;
 
     private boolean disabled;
     private String authorizedKeysPath;
@@ -200,7 +206,6 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
             response.reset();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setHeader(Constants.HEADER_CHALLENGE, session.getChallenge().toString());
-            LOGGER.error("[sendChallenge] challengeHash={}", new String(session.getChallenge().getHash()));
 
             try {
                 response.flushBuffer();

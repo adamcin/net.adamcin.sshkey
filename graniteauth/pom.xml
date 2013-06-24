@@ -76,7 +76,8 @@
                             *
                         </Import-Package>
 						<Embed-Dependency>
-                            org.apache.sling.commons.osgi
+                            org.apache.sling.commons.osgi,
+                            crx-auth-token
                         </Embed-Dependency>
                     </instructions>
 					<obrRepository>false</obrRepository>
@@ -150,6 +151,15 @@
                     <plugin>
                         <groupId>net.adamcin</groupId>
                         <artifactId>vltpack-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>IT-put-bundle</goal>
+                                    <goal>IT-http-properties</goal>
+                                    <goal>IT-server-ready</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                         <configuration>
                             <supportITs>true</supportITs>
                         </configuration>
@@ -175,13 +185,26 @@
         <dependency>
             <groupId>com.adobe.granite</groupId>
             <artifactId>com.adobe.granite.crypto</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.12</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.settings</artifactId>
             <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.webconsole</artifactId>
+            <version>3.1.6</version>
+            <!--<version>3.1.9-R1239093</version>-->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-api</artifactId>
+            <version>2.4.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

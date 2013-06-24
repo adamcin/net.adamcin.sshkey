@@ -72,6 +72,7 @@
                             net.adamcin.sshkey.clientauth.*
                         </Export-Package>
                         <Import-Package>
+                            com.ning.http.*;resolution:=optional,
                             org.apache.http.*;resolution:=optional,
                             org.apache.commons.httpclient.*;resolution:=optional,
                             *
