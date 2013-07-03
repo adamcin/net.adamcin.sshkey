@@ -5,7 +5,8 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
 import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.sshkey.clientauth.KeyTestUtil;
-import net.adamcin.sshkey.commons.Signer;
+import net.adamcin.sshkey.api.Signer;
+import net.adamcin.sshkey.api.SignerFactory;
 import org.junit.Test;
 
 import java.io.File;
@@ -27,7 +28,7 @@ public class AsyncUtilIT {
             @Override
             protected void execute() throws Exception {
 
-                Signer signer = new Signer();
+                Signer signer = SignerFactory.getFactoryInstance().getInstance();
 
                 File keyFile = KeyTestUtil.getPrivateKeyAsFile("b2048", "id_rsa");
 

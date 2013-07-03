@@ -1,4 +1,4 @@
-package net.adamcin.sshkey.commons;
+package net.adamcin.sshkey.api;
 
 public final class VerifierException extends Exception {
 

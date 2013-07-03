@@ -6,8 +6,9 @@ import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.commons.testing.sling.SlingITContext;
 import net.adamcin.commons.testing.sling.VltpackITContext;
 import net.adamcin.sshkey.clientauth.http4.Http4Util;
-import net.adamcin.sshkey.commons.Signer;
-import net.adamcin.sshkey.commons.SignerException;
+import net.adamcin.sshkey.api.Signer;
+import net.adamcin.sshkey.api.SignerException;
+import net.adamcin.sshkey.api.SignerFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.sling.testing.tools.http.Request;
 import org.apache.sling.testing.tools.http.RequestBuilder;
@@ -28,7 +29,7 @@ public class SSHKeyAuthenticationHandlerIT {
         TestBody.test(new TestBody() {
             @Override protected void execute() throws Exception {
 
-                final Signer signer = new Signer();
+                final Signer signer = SignerFactory.getFactoryInstance().getInstance();
 
                 try {
                     File pkeyFile = SSHKeyTestUtil.getPrivateKeyAsFile("b4096");

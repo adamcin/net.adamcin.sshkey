@@ -1,8 +1,7 @@
 package net.adamcin.sshkey.clientauth.http4;
 
-import net.adamcin.sshkey.commons.Constants;
-import net.adamcin.sshkey.commons.Signer;
-import org.apache.commons.httpclient.methods.GetMethod;
+import net.adamcin.sshkey.api.Constants;
+import net.adamcin.sshkey.api.Signer;
 import org.apache.http.auth.AuthScheme;
 import org.apache.http.auth.AuthSchemeFactory;
 import org.apache.http.auth.params.AuthPNames;
@@ -42,15 +41,15 @@ public final class Http4Util {
     public static void setHeaders(HttpUriRequest request, Signer signer, String username) {
         if (request != null) {
 
-            request.removeHeaders(Constants.HEADER_X_SSHKEY_USERNAME);
+            request.removeHeaders(Constants.SSHKEY_USERNAME);
             if (username != null) {
-                request.setHeader(Constants.HEADER_X_SSHKEY_USERNAME, username);
+                request.setHeader(Constants.SSHKEY_USERNAME, username);
             }
 
-            request.removeHeaders(Constants.HEADER_X_SSHKEY_FINGERPRINT);
+            request.removeHeaders(Constants.SSHKEY_FINGERPRINT);
             if (signer != null) {
                 for (String fingerprint : signer.getFingerprints()) {
-                    request.addHeader(Constants.HEADER_X_SSHKEY_FINGERPRINT, fingerprint);
+                    request.addHeader(Constants.SSHKEY_FINGERPRINT, fingerprint);
                 }
             }
         }

@@ -36,12 +36,12 @@
         <relativePath>..</relativePath>
     </parent>
 
-    <artifactId>net.adamcin.sshkey.commons</artifactId>
+    <artifactId>sshkey-api</artifactId>
     <packaging>jar</packaging>
 
 	<name>${project.artifactId}</name>
     <description>
-		Bundle providing constants and HTTP client authentication handlers
+		Library providing SSHKey API
     </description>
 
 	<inceptionYear>2013</inceptionYear>
@@ -64,24 +64,14 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            net.adamcin.sshkey.provider
-                        </Export-Package>
-                        <Private-Package>
-                            net.adamcin.sshkey.provider.jsch.*
-                        </Private-Package>
-                        <Import-Package>
-                            com.jcraft.*;resolution:=optional,
-                            *
-                        </Import-Package>
-                        <Embed-Dependency>jsch</Embed-Dependency>
-                    </instructions>
-					<obrRepository>false</obrRepository>
-                </configuration>
+                <artifactId>maven-scr-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>scr</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.github.github</groupId>
@@ -107,57 +97,10 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>itests</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>2.14</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                    <goal>verify</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>net.adamcin</groupId>
-                        <artifactId>vltpack-maven-plugin</artifactId>
-                        <configuration>
-                            <supportITs>true</supportITs>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <dependencies>
-        <dependency>
-            <groupId>net.adamcin.sshkey</groupId>
-            <artifactId>sshkey-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.scr.annotations</artifactId>
         </dependency>
 
         <dependency>
@@ -178,6 +121,12 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.4</version>
             <scope>test</scope>
         </dependency>
 

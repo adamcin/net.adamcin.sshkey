@@ -36,12 +36,12 @@
         <relativePath>..</relativePath>
     </parent>
 
-    <artifactId>net.adamcin.sshkey.clientauth</artifactId>
-    <packaging>bundle</packaging>
+    <artifactId>sshkey-clientauth</artifactId>
+    <packaging>jar</packaging>
 
 	<name>${project.artifactId}</name>
     <description>
-		Bundle providing HTTP client authentication handlers
+		Library providing HTTP client authentication handlers
     </description>
 
 	<inceptionYear>2013</inceptionYear>
@@ -61,37 +61,6 @@
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            net.adamcin.sshkey.clientauth.*
-                        </Export-Package>
-                        <Import-Package>
-                            com.ning.http.*;resolution:=optional,
-                            org.apache.http.*;resolution:=optional,
-                            org.apache.commons.httpclient.*;resolution:=optional,
-                            *
-                        </Import-Package>
-                    </instructions>
-					<obrRepository>false</obrRepository>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>net.adamcin</groupId>
-                <artifactId>vltpack-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>auto-deploy-bundle</id>
-                        <goals>
-                            <goal>IT-put-bundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>com.github.github</groupId>
@@ -117,44 +86,10 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>itests</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>2.14</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                    <goal>verify</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>net.adamcin</groupId>
-                        <artifactId>vltpack-maven-plugin</artifactId>
-                        <configuration>
-                            <supportITs>true</supportITs>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>net.adamcin.sshkey</groupId>
-            <artifactId>net.adamcin.sshkey.commons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
+            <artifactId>sshkey-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
@@ -179,6 +114,11 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>net.adamcin.sshkey</groupId>
+            <artifactId>net.adamcin.sshkey.provider.jsch</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

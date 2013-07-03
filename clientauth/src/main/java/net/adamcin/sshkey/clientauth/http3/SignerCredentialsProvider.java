@@ -1,7 +1,7 @@
 package net.adamcin.sshkey.clientauth.http3;
 
-import net.adamcin.sshkey.commons.Constants;
-import net.adamcin.sshkey.commons.Signer;
+import net.adamcin.sshkey.api.Constants;
+import net.adamcin.sshkey.api.Signer;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.auth.AuthScheme;
 import org.apache.commons.httpclient.auth.CredentialsNotAvailableException;

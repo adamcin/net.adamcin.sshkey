@@ -1,13 +1,23 @@
-package net.adamcin.sshkey.commons;
+package net.adamcin.sshkey.api;
 
-public final class Authorization {
+import java.io.Serializable;
+
+/**
+ * Representation of the "Authorization: SSHKey ..." header sent by the client in response to a {@link Challenge}
+ */
+public final class Authorization implements Serializable {
 
     private final String token;
     private final String signature;
 
-    public Authorization(String token, String signature) {
+    public Authorization(final String token, final String signature) {
         this.token = token;
         this.signature = signature;
+    }
+
+    public Authorization(String token, byte[] signatureBytes) {
+        this.token = token;
+        this.signature = Base64.toBase64String(signatureBytes);
     }
 
     public String getToken() {
@@ -16,6 +26,10 @@ public final class Authorization {
 
     public String getSignature() {
         return signature;
+    }
+
+    public byte[] getSignatureBytes() {
+        return Base64.fromBase64String(this.signature);
     }
 
     @Override

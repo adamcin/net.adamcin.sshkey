@@ -1,10 +1,10 @@
 package net.adamcin.sshkey.clientauth.http4;
 
-import net.adamcin.sshkey.commons.Authorization;
-import net.adamcin.sshkey.commons.Challenge;
-import net.adamcin.sshkey.commons.Constants;
-import net.adamcin.sshkey.commons.Signer;
-import net.adamcin.sshkey.commons.SignerException;
+import net.adamcin.sshkey.api.Authorization;
+import net.adamcin.sshkey.api.Challenge;
+import net.adamcin.sshkey.api.Constants;
+import net.adamcin.sshkey.api.Signer;
+import net.adamcin.sshkey.api.SignerException;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.auth.AuthenticationException;
@@ -35,20 +35,20 @@ public final class Http4SSHKeyAuthScheme extends RFC2617Scheme {
     public Header authenticate(Credentials credentials, HttpRequest request)
             throws AuthenticationException {
 
-        String fingerprint = this.getParameter(Constants.CHALLENGE_PARAM_FINGERPRINT);
-        String token = this.getParameter(Constants.CHALLENGE_PARAM_TOKEN);
+        String fingerprint = this.getParameter(Constants.FINGERPRINT);
+        String nonce = this.getParameter(Constants.NONCE);
 
-        Header hostHeader = request.getFirstHeader(Constants.HEADER_HOST);
-        Header userAgentHeader = request.getFirstHeader(Constants.HEADER_USER_AGENT);
+        Header hostHeader = request.getFirstHeader(Constants.HOST);
+        Header userAgentHeader = request.getFirstHeader(Constants.USER_AGENT);
         String host = hostHeader != null ? hostHeader.getValue() : "";
         String userAgent = userAgentHeader != null ? userAgentHeader.getValue() : "";
 
-        Challenge challenge = new Challenge(this.getRealm(), fingerprint, token, host, userAgent);
+        Challenge challenge = new Challenge(this.getRealm(), fingerprint, nonce, host, userAgent);
 
         try {
             Authorization authorization = this.signer.sign(challenge);
             if (authorization != null) {
-                return new BasicHeader(Constants.HEADER_AUTHORIZATION,
+                return new BasicHeader(Constants.AUTHORIZATION,
                                        authorization.toString());
             }
         } catch (SignerException e) {

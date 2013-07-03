@@ -1,6 +1,6 @@
 package net.adamcin.sshkey.clientauth.http3;
 
-import net.adamcin.sshkey.commons.Signer;
+import net.adamcin.sshkey.api.Signer;
 import org.apache.commons.httpclient.Credentials;
 
 public final class SignerCredentials implements Credentials {

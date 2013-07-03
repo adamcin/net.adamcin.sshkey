@@ -1,10 +1,10 @@
 package net.adamcin.sshkey.clientauth.http3;
 
-import net.adamcin.sshkey.commons.Authorization;
-import net.adamcin.sshkey.commons.Challenge;
-import net.adamcin.sshkey.commons.Constants;
-import net.adamcin.sshkey.commons.Signer;
-import net.adamcin.sshkey.commons.SignerException;
+import net.adamcin.sshkey.api.Authorization;
+import net.adamcin.sshkey.api.Challenge;
+import net.adamcin.sshkey.api.Constants;
+import net.adamcin.sshkey.api.Signer;
+import net.adamcin.sshkey.api.SignerException;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
@@ -33,11 +33,11 @@ public final class Http3SSHKeyAuthScheme extends RFC2617Scheme {
         if (credentials instanceof SignerCredentials) {
             SignerCredentials creds = (SignerCredentials) credentials;
 
-            String fingerprint = this.getParameter(Constants.CHALLENGE_PARAM_FINGERPRINT);
-            String sessionId = this.getParameter(Constants.CHALLENGE_PARAM_TOKEN);
+            String fingerprint = this.getParameter(Constants.FINGERPRINT);
+            String sessionId = this.getParameter(Constants.NONCE);
 
-            Header hostHeader = method.getRequestHeader(Constants.HEADER_HOST);
-            Header userAgentHeader = method.getRequestHeader(Constants.HEADER_USER_AGENT);
+            Header hostHeader = method.getRequestHeader(Constants.HOST);
+            Header userAgentHeader = method.getRequestHeader(Constants.USER_AGENT);
             String host = hostHeader != null ? hostHeader.getValue() : "";
             String userAgent = userAgentHeader != null ? userAgentHeader.getValue() : "";
 

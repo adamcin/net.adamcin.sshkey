@@ -68,14 +68,26 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Export-Package>
+                            net.adamcin.sshkey.api,
+                            net.adamcin.sshkey.clientauth.*
+                        </Export-Package>
                         <Private-Package>
+                            net.adamcin.sshkey.provider.jsch.*,
                             net.adamcin.sshkey.graniteauth.*
                         </Private-Package>
                         <Import-Package>
+                            org.apache.http.*;resolution:=optional,
+                            com.ning.http.*;resolution:=optional,
+                            org.apache.commons.httpclient.*;resolution:=optional,
                             com.jcraft.*;resolution:=optional,
                             *
                         </Import-Package>
 						<Embed-Dependency>
+                            sshkey-api,
+                            sshkey-clientauth,
+                            net.adamcin.sshkey.provider.jsch,
+                            jsch,
                             org.apache.sling.commons.osgi,
                             crx-auth-token
                         </Embed-Dependency>
@@ -172,15 +184,25 @@
     <dependencies>
         <dependency>
             <groupId>net.adamcin.sshkey</groupId>
-            <artifactId>net.adamcin.sshkey.commons</artifactId>
+            <artifactId>sshkey-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.jcr</groupId>
-            <artifactId>jcr</artifactId>
+            <groupId>net.adamcin.sshkey</groupId>
+            <artifactId>sshkey-clientauth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.adamcin.sshkey</groupId>
+            <artifactId>net.adamcin.sshkey.provider.jsch</artifactId>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
+            <version>0.1.50</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.jcr</groupId>
+            <artifactId>jcr</artifactId>
         </dependency>
         <dependency>
             <groupId>com.adobe.granite</groupId>
@@ -250,11 +272,6 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>net.adamcin.sshkey</groupId>
-            <artifactId>net.adamcin.sshkey.clientauth</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

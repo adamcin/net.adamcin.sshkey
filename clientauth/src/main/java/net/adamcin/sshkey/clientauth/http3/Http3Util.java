@@ -1,7 +1,7 @@
 package net.adamcin.sshkey.clientauth.http3;
 
-import net.adamcin.sshkey.commons.Constants;
-import net.adamcin.sshkey.commons.Signer;
+import net.adamcin.sshkey.api.Constants;
+import net.adamcin.sshkey.api.Signer;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.auth.AuthPolicy;
@@ -40,16 +40,16 @@ public final class Http3Util {
     public static void setHeaders(HttpMethod method, String username, Signer signer) {
         if (method != null) {
             if (username != null) {
-                method.setRequestHeader(Constants.HEADER_X_SSHKEY_USERNAME, username);
+                method.setRequestHeader(Constants.SSHKEY_USERNAME, username);
             } else {
-                method.removeRequestHeader(Constants.HEADER_X_SSHKEY_USERNAME);
+                method.removeRequestHeader(Constants.SSHKEY_USERNAME);
             }
-            while (method.getRequestHeader(Constants.HEADER_X_SSHKEY_FINGERPRINT) != null) {
-                method.removeRequestHeader(Constants.HEADER_X_SSHKEY_FINGERPRINT);
+            while (method.getRequestHeader(Constants.SSHKEY_FINGERPRINT) != null) {
+                method.removeRequestHeader(Constants.SSHKEY_FINGERPRINT);
             }
             if (signer != null) {
                 for (String fingerprint : signer.getFingerprints()) {
-                    method.addRequestHeader(Constants.HEADER_X_SSHKEY_FINGERPRINT, fingerprint);
+                    method.addRequestHeader(Constants.SSHKEY_FINGERPRINT, fingerprint);
                 }
             }
         }

@@ -33,15 +33,15 @@
         <groupId>net.adamcin.sshkey</groupId>
         <artifactId>sshkey</artifactId>
         <version>0.5.0-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+		<relativePath>../..</relativePath>
     </parent>
 
-    <artifactId>net.adamcin.sshkey.commons</artifactId>
+    <artifactId>net.adamcin.sshkey.provider.jsch</artifactId>
     <packaging>jar</packaging>
 
 	<name>${project.artifactId}</name>
     <description>
-		Bundle providing constants and HTTP client authentication handlers
+		Library providing a Jsch-based implementation of the SSHKey API
     </description>
 
 	<inceptionYear>2013</inceptionYear>
@@ -60,27 +60,6 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            net.adamcin.sshkey.provider
-                        </Export-Package>
-                        <Private-Package>
-                            net.adamcin.sshkey.provider.jsch.*
-                        </Private-Package>
-                        <Import-Package>
-                            com.jcraft.*;resolution:=optional,
-                            *
-                        </Import-Package>
-                        <Embed-Dependency>jsch</Embed-Dependency>
-                    </instructions>
-					<obrRepository>false</obrRepository>
                 </configuration>
             </plugin>
             <plugin>
@@ -143,21 +122,9 @@
             <artifactId>sshkey-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.scr.annotations</artifactId>
+			<version>0.1.50</version>
         </dependency>
 
         <dependency>
@@ -179,6 +146,11 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+			<scope>test</scope>
         </dependency>
 
     </dependencies>

@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-@Component
+@Component(label = "Enhanced Sling Web Console Security Provider", metatype = true)
 @Service
 public class SlingWebConsoleSecurityProvider2 implements WebConsoleSecurityProvider2 {
     private static final Logger LOGGER = LoggerFactory.getLogger(SlingWebConsoleSecurityProvider2.class);
@@ -105,7 +105,6 @@ public class SlingWebConsoleSecurityProvider2 implements WebConsoleSecurityProvi
     }
 
     public boolean authorize(Object o, String s) {
-        LOGGER.error("[authenticate] o={}, s={}", o, s);
         return true;
     }
 }

@@ -1,17 +1,15 @@
 package net.adamcin.sshkey.clientauth.async;
 
 import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.AsyncCompletionHandlerBase;
-import com.ning.http.client.AsyncHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import com.ning.http.util.AsyncHttpProviderUtils;
-import net.adamcin.sshkey.commons.Authorization;
-import net.adamcin.sshkey.commons.Challenge;
-import net.adamcin.sshkey.commons.Constants;
-import net.adamcin.sshkey.commons.Signer;
+import net.adamcin.sshkey.api.Authorization;
+import net.adamcin.sshkey.api.Challenge;
+import net.adamcin.sshkey.api.Constants;
+import net.adamcin.sshkey.api.Signer;
 
 import java.net.URL;
 
@@ -65,8 +63,8 @@ public final class LoginChallengeHandler <T> extends AsyncCompletionHandler<T> {
     }
 
     private static String getUserAgent(AsyncHttpClient client, Request request) {
-        if (request.getHeaders().getFirstValue(Constants.HEADER_USER_AGENT) != null) {
-            return request.getHeaders().getFirstValue(Constants.HEADER_USER_AGENT);
+        if (request.getHeaders().getFirstValue(Constants.USER_AGENT) != null) {
+            return request.getHeaders().getFirstValue(Constants.USER_AGENT);
         } else if (client.getConfig().getUserAgent() != null) {
             return client.getConfig().getUserAgent();
         } else {
@@ -78,7 +76,7 @@ public final class LoginChallengeHandler <T> extends AsyncCompletionHandler<T> {
     public T onCompleted(Response response) throws Exception {
         if (response.getStatusCode() == 401) {
             Challenge challenge = Challenge.parseChallenge(
-                    response.getHeader(Constants.HEADER_CHALLENGE),
+                    response.getHeader(Constants.CHALLENGE),
                     getHost(request),
                     getUserAgent(client, request)
             );
@@ -87,7 +85,7 @@ public final class LoginChallengeHandler <T> extends AsyncCompletionHandler<T> {
                 Authorization authorization = signer.sign(challenge);
                 if (authorization != null) {
                     Request authRequest = decorator.decorate(client.prepareGet(getLoginUrl(request))).addHeader(
-                            Constants.HEADER_AUTHORIZATION,
+                            Constants.AUTHORIZATION,
                             authorization.toString()
                     ).build();
 

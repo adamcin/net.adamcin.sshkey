@@ -4,20 +4,19 @@ import com.adobe.granite.crypto.CryptoException;
 import com.adobe.granite.crypto.CryptoSupport;
 import com.day.crx.security.token.TokenCookie;
 import com.day.crx.security.token.TokenUtil;
-import net.adamcin.sshkey.commons.Authorization;
-import net.adamcin.sshkey.commons.Constants;
-import net.adamcin.sshkey.commons.Verifier;
-import net.adamcin.sshkey.commons.VerifierException;
+import net.adamcin.sshkey.api.Authorization;
+import net.adamcin.sshkey.api.Constants;
+import net.adamcin.sshkey.api.Verifier;
+import net.adamcin.sshkey.api.VerifierException;
+import net.adamcin.sshkey.api.VerifierFactory;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.apache.felix.scr.annotations.Service;
-import org.apache.felix.webconsole.WebConsoleSecurityProvider;
-import org.apache.felix.webconsole.WebConsoleSecurityProvider2;
 import org.apache.sling.auth.core.spi.AbstractAuthenticationHandler;
-import org.apache.sling.auth.core.spi.AuthenticationHandler;
 import org.apache.sling.auth.core.spi.AuthenticationInfo;
 import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.apache.sling.jcr.api.SlingRepository;
@@ -44,7 +43,6 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
     private static final Logger LOGGER = LoggerFactory.getLogger(SSHKeyAuthenticationHandler.class);
 
     private static final String AUTHORIZED_KEYS_REL_PATH = ".ssh/authorized_keys";
-    private static final String SLING_AUTH_REQUEST_LOGIN = "sling:authRequestLogin";
     private static final int MAX_SESSIONS = 10000;
 
     @Property(name = TYPE_PROPERTY, propertyPrivate = true)
@@ -63,6 +61,9 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
     @Property(label = "Realm", description = "Authentication Realm", value = DEFAULT_REALM)
     private static final String OSGI_REALM = "auth.sshkey.realm";
 
+    @Property(label = "Disabled", description = "Check to disable sshkey authentication", boolValue = false)
+    private static final String OSGI_DISABLED = "auth.sshkey.disabled";
+
     @Reference
     private SlingSettingsService slingSettingsService;
 
@@ -72,8 +73,10 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
     @Reference
     private CryptoSupport cryptoSupport;
 
-    //@Reference(target = "(component.name=com.day.crx.security.token.impl.impl.TokenAuthenticationHandler)")
-    //private AuthenticationHandler tokenHandler;
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL_UNARY)
+    private VerifierFactory verifierFactory;
+
+    private final VerifierFactory defaultVerifierFactory = VerifierFactory.getFactoryInstance();
 
     private boolean disabled;
     private String authorizedKeysPath;
@@ -83,13 +86,22 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
 
     @Activate
     protected void activate(ComponentContext ctx, Map<String, Object> props) {
+        this.disabled = PropertiesUtil.toBoolean(props.get(OSGI_DISABLED), false);
         this.authorizedKeysPath = PropertiesUtil.toString(props.get(OSGI_AUTH_KEYS_PATH), "");
-
         this.realm = PropertiesUtil.toString(props.get(OSGI_REALM), DEFAULT_REALM);
+    }
+
+    private VerifierFactory getVerifierFactory() {
+        if (verifierFactory != null) {
+            return verifierFactory;
+        } else {
+            return defaultVerifierFactory;
+        }
     }
 
     @Deactivate
     protected void deactivate(ComponentContext ctx) {
+        this.disabled = false;
         this.authorizedKeysPath = null;
         this.realm = null;
 
@@ -103,7 +115,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
     }
 
     protected Verifier getVerifier() {
-        Verifier verifier = new Verifier();
+        Verifier verifier = getVerifierFactory().getInstance();
         try {
             verifier.readAuthorizedKeys(getAuthorizedKeysFile());
         } catch (VerifierException e) {
@@ -163,7 +175,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
     }
 
     protected static String getSSHKeyUsername(HttpServletRequest request) {
-        return request.getHeader(Constants.HEADER_X_SSHKEY_USERNAME);
+        return request.getHeader(Constants.SSHKEY_USERNAME);
     }
 
     protected boolean forceAuthentication(HttpServletRequest request,
@@ -174,7 +186,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
 
     protected String selectFingerprint(String username, HttpServletRequest request) {
         List<String> _fingerprints = new ArrayList<String>();
-        Enumeration fingerprints = request.getHeaders(Constants.HEADER_X_SSHKEY_FINGERPRINT);
+        Enumeration fingerprints = request.getHeaders(Constants.SSHKEY_FINGERPRINT);
         if (fingerprints != null) {
             while (fingerprints.hasMoreElements()) {
                 String fingerprint = (String) fingerprints.nextElement();
@@ -205,7 +217,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
         if (session != null) {
             response.reset();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setHeader(Constants.HEADER_CHALLENGE, session.getChallenge().toString());
+            response.setHeader(Constants.CHALLENGE, session.getChallenge().toString());
 
             try {
                 response.flushBuffer();
@@ -223,7 +235,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
             try {
                 SSHKeySession session = SSHKeySession.createSession(cryptoSupport, username, fingerprint, realm, request);
                 synchronized (this.sessions) {
-                    this.sessions.put(session.getChallenge().getToken(), session);
+                    this.sessions.put(session.getChallenge().getNonce(), session);
                 }
                 return session;
             } catch (CryptoException e) {
@@ -265,7 +277,7 @@ public final class SSHKeyAuthenticationHandler extends AbstractAuthenticationHan
                                                  HttpServletResponse response) {
 
         // Return immediately if the header is missing
-        String authHeader = request.getHeader(Constants.HEADER_AUTHORIZATION);
+        String authHeader = request.getHeader(Constants.AUTHORIZATION);
         if (authHeader == null || authHeader.length() == 0) {
             return null;
         }

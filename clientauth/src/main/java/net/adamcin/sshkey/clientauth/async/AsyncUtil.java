@@ -6,8 +6,8 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
-import net.adamcin.sshkey.commons.Constants;
-import net.adamcin.sshkey.commons.Signer;
+import net.adamcin.sshkey.api.Constants;
+import net.adamcin.sshkey.api.Signer;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -23,12 +23,12 @@ public final class AsyncUtil {
     public static void setHeaders(AsyncHttpClient.BoundRequestBuilder builder, Signer signer, String username) {
         if (builder != null) {
             Map<String, Collection<String>> headers = new HashMap<String, Collection<String>>();
-            headers.put(Constants.HEADER_X_SSHKEY_USERNAME, Arrays.asList(username));
+            headers.put(Constants.SSHKEY_USERNAME, Arrays.asList(username));
 
             if (signer != null) {
-                headers.put(Constants.HEADER_X_SSHKEY_FINGERPRINT, signer.getFingerprints());
+                headers.put(Constants.SSHKEY_FINGERPRINT, signer.getFingerprints());
             } else {
-                headers.put(Constants.HEADER_X_SSHKEY_FINGERPRINT, Collections.<String>emptyList());
+                headers.put(Constants.SSHKEY_FINGERPRINT, Collections.<String>emptyList());
             }
 
             builder.setHeaders(headers);
