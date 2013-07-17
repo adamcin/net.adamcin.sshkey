@@ -2,6 +2,10 @@ package net.adamcin.sshkey.api;
 
 import java.util.Arrays;
 
+/**
+ * An "inlined" version of Apache Commons Codec Base64 implementation, stripped down and flattened
+ * to only support the type of non-chunked Base64 encoding required by the SSH Key spec.
+ */
 public final class Base64 {
 
     static final int MAX_RESULT_SIZE = Integer.MAX_VALUE;
@@ -159,9 +163,7 @@ public final class Base64 {
             // We have some spare bits remaining
             // Output all whole multiples of 8 bits and ignore the rest
             switch (context.modulus) {
-//              case 0 : // impossible, as excluded above
                 case 1 : // 6 bits - ignore entirely
-                    // TODO not currently tested; perhaps it is impossible?
                     break;
                 case 2 : // 12 bits = 8 + 4
                     context.ibitWorkArea = context.ibitWorkArea >> 4; // dump the extra 4 bits

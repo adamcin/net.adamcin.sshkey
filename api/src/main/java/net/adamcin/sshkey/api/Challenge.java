@@ -9,9 +9,10 @@ import java.util.regex.Pattern;
  */
 public final class Challenge implements Serializable {
     private static final String CRLF = "\r\n";
-    private static final Pattern REALM_PATTERN = Pattern.compile(Constants.REALM + "=\"([^\"]*)\"");
-    private static final Pattern FINGERPRINT_PATTERN = Pattern.compile(Constants.FINGERPRINT + "=\"([^\"]*)\"");
-    private static final Pattern NONCE_MATCHER = Pattern.compile(Constants.NONCE + "=\"([^\"\\s]*)\"");
+    private static final String RFC2617_PARAM = "=\"([^\"]*)\"";
+    private static final Pattern REALM_PATTERN = Pattern.compile(Constants.REALM + RFC2617_PARAM);
+    private static final Pattern FINGERPRINT_PATTERN = Pattern.compile(Constants.FINGERPRINT + RFC2617_PARAM);
+    private static final Pattern NONCE_MATCHER = Pattern.compile(Constants.NONCE + RFC2617_PARAM);
 
     private final String realm;
     private final String fingerprint;

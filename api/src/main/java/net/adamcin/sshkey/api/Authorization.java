@@ -24,10 +24,16 @@ public final class Authorization implements Serializable {
         return token;
     }
 
+    /**
+     * @return the signature as a Base64-encoded string
+     */
     public String getSignature() {
         return signature;
     }
 
+    /**
+     * @return the signature as an unencoded byte array for verification using a {@link Verifier}
+     */
     public byte[] getSignatureBytes() {
         return Base64.fromBase64String(this.signature);
     }

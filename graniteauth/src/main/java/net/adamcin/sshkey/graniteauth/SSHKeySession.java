@@ -6,8 +6,9 @@ import net.adamcin.sshkey.api.Challenge;
 import net.adamcin.sshkey.api.Constants;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 
-public final class SSHKeySession {
+public final class SSHKeySession implements Serializable {
     private final Challenge challenge;
     private final String username;
     private final String remoteAddr;
