@@ -159,6 +159,7 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>2.14</version>
                 </plugin>
+                <!--
                 <plugin>
                     <groupId>net.adamcin</groupId>
                     <artifactId>vltpack-maven-plugin</artifactId>
@@ -167,6 +168,7 @@
                         <bundleInstallPath>/libs/sshkey/install</bundleInstallPath>
                     </configuration>
                 </plugin>
+                -->
             </plugins>
         </pluginManagement>
         <plugins>
