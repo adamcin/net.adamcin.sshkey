@@ -37,12 +37,12 @@ public final class Http3Util {
         client.getParams().setParameter(AuthPolicy.AUTH_SCHEME_PRIORITY, schemes);
     }
 
-    public static void setHeaders(HttpMethod method, String username, Signer signer) {
+    public static void setHeaders(HttpMethod method, String loginId, Signer signer) {
         if (method != null) {
-            if (username != null) {
-                method.setRequestHeader(Constants.SSHKEY_USERNAME, username);
+            if (loginId != null) {
+                method.setRequestHeader(Constants.SSHKEY_LOGIN_ID, loginId);
             } else {
-                method.removeRequestHeader(Constants.SSHKEY_USERNAME);
+                method.removeRequestHeader(Constants.SSHKEY_LOGIN_ID);
             }
             while (method.getRequestHeader(Constants.SSHKEY_FINGERPRINT) != null) {
                 method.removeRequestHeader(Constants.SSHKEY_FINGERPRINT);

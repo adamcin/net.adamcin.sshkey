@@ -38,12 +38,12 @@ public final class Http4Util {
         HttpClientParams.setAuthenticating(client.getParams(), true);
     }
 
-    public static void setHeaders(HttpUriRequest request, Signer signer, String username) {
+    public static void setHeaders(HttpUriRequest request, Signer signer, String loginId) {
         if (request != null) {
 
-            request.removeHeaders(Constants.SSHKEY_USERNAME);
-            if (username != null) {
-                request.setHeader(Constants.SSHKEY_USERNAME, username);
+            request.removeHeaders(Constants.SSHKEY_LOGIN_ID);
+            if (loginId != null) {
+                request.setHeader(Constants.SSHKEY_LOGIN_ID, loginId);
             }
 
             request.removeHeaders(Constants.SSHKEY_FINGERPRINT);
@@ -55,14 +55,14 @@ public final class Http4Util {
         }
     }
 
-    public static boolean login(String loginUri, Signer signer, String username, int expectStatus,
+    public static boolean login(String loginUri, Signer signer, String loginId, int expectStatus,
                                 AbstractHttpClient client,
                                 HttpContext context)
             throws IOException {
 
         enableAuth(signer, client);
         HttpUriRequest request = new HttpGet(loginUri);
-        setHeaders(request, signer, username);
+        setHeaders(request, signer, loginId);
         return client.execute(request, context).getStatusLine().getStatusCode() == expectStatus;
     }
 

@@ -23,7 +23,7 @@
   ~ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
   ~ OTHER DEALINGS IN THE SOFTWARE.
   ~
-  ~ For more information, please refer to <http://unlicense.org />
+  ~ For more information, please refer to <http://unlicense.org/>
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -53,9 +53,10 @@
 
     <modules>
         <module>api</module>
-        <module>provider/jsch</module>
+        <module>test-common</module>
+        <module>simple</module>
         <module>clientauth</module>
-        <module>graniteauth</module>
+        <module>provider/jsch</module>
         <module>clitool</module>
     </modules>
 
@@ -159,6 +160,24 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>2.14</version>
                 </plugin>
+                <plugin>
+                    <groupId>com.github.github</groupId>
+                    <artifactId>site-maven-plugin</artifactId>
+                    <version>0.9</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>templating-maven-plugin</artifactId>
+                    <version>1.0-alpha-3</version> <!-- Be sure to use the last version. Check on the website's plugin -->
+                    <executions>
+                        <execution>
+                            <id>filter-src</id>
+                            <goals>
+                                <goal>filter-sources</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
                 <!--
                 <plugin>
                     <groupId>net.adamcin</groupId>
@@ -175,14 +194,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.3</version>
                 <configuration>
                     <inputEncoding>utf-8</inputEncoding>
                     <reportPlugins>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-project-info-reports-plugin</artifactId>
-                            <version>2.4</version>
+                            <version>2.7</version>
                         </plugin>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
@@ -194,7 +213,7 @@
             <plugin>
                 <groupId>com.github.github</groupId>
                 <artifactId>site-maven-plugin</artifactId>
-                <version>0.8</version>
+                <version>0.9</version>
                 <configuration>
                     <message>Creating site for ${project.artifactId} ${project.version}</message>
                     <noJekyll>true</noJekyll>
@@ -223,6 +242,17 @@
             </dependency>
             <dependency>
                 <groupId>net.adamcin.sshkey</groupId>
+                <artifactId>sshkey-test-common</artifactId>
+                <version>${project.version}</version>
+				<scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.adamcin.sshkey</groupId>
+                <artifactId>sshkey-simple</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.adamcin.sshkey</groupId>
                 <artifactId>net.adamcin.sshkey.provider.jsch</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
@@ -233,73 +263,24 @@
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
-            <dependency>
-                <groupId>net.adamcin.sshkey</groupId>
-                <artifactId>net.adamcin.sshkey.graniteauth</artifactId>
-                <version>${project.version}</version>
-                <scope>provided</scope>
-            </dependency>
+
             <dependency>
                 <groupId>net.adamcin.sshkey</groupId>
                 <artifactId>net.adamcin.sshkey.clitool</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
-
             <dependency>
-                <groupId>org.apache.sling</groupId>
-                <artifactId>org.apache.sling.junit.core</artifactId>
-                <version>1.0.8</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sling</groupId>
-                <artifactId>org.apache.sling.junit.remote</artifactId>
-                <version>1.0.8</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sling</groupId>
-                <artifactId>org.apache.sling.junit.scriptable</artifactId>
-                <version>1.0.8</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sling</groupId>
-                <artifactId>org.apache.sling.testing.tools</artifactId>
-                <version>1.0.6</version>
+                <groupId>biz.aQute.bnd</groupId>
+                <artifactId>bndlib</artifactId>
+                <version>2.1.0</version>
                 <scope>provided</scope>
             </dependency>
 
-            <dependency>
-                <groupId>net.adamcin.commons</groupId>
-                <artifactId>net.adamcin.commons.jcr</artifactId>
-                <version>0.6.0</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>javax.jcr</groupId>
-                <artifactId>jcr</artifactId>
-                <version>2.0</version>
-                <scope>provided</scope>
-            </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sling</groupId>
-                <artifactId>org.apache.sling.commons.json</artifactId>
-                <version>2.0.6</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>2.5</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -309,52 +290,21 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>3.2.1</version>
+                <groupId>com.jcraft</groupId>
+                <artifactId>jsch</artifactId>
+                <version>0.1.50</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.apache.sling</groupId>
-                <artifactId>org.apache.sling.commons.osgi</artifactId>
-                <version>2.1.0</version>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>1.49</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.apache.sling</groupId>
-                <artifactId>org.apache.sling.api</artifactId>
-                <version>2.2.0</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>servlet-api</artifactId>
-                <version>2.5</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>jsp-api</artifactId>
-                <version>2.0</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.core</artifactId>
-                <version>4.2.0</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.compendium</artifactId>
-                <version>4.2.0</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>org.apache.felix.scr.annotations</artifactId>
-                <version>${scr.annotations.version}</version>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>1.49</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -375,7 +325,7 @@
             <dependency>
                 <groupId>net.adamcin.commons</groupId>
                 <artifactId>net.adamcin.commons.testing</artifactId>
-                <version>0.6.0</version>
+                <version>0.8.0</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

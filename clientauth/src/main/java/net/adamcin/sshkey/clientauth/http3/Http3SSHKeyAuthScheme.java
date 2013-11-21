@@ -4,7 +4,6 @@ import net.adamcin.sshkey.api.Authorization;
 import net.adamcin.sshkey.api.Challenge;
 import net.adamcin.sshkey.api.Constants;
 import net.adamcin.sshkey.api.Signer;
-import net.adamcin.sshkey.api.SignerException;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
@@ -32,7 +31,6 @@ public final class Http3SSHKeyAuthScheme extends RFC2617Scheme {
     public String authenticate(Credentials credentials, HttpMethod method) throws AuthenticationException {
         if (credentials instanceof SignerCredentials) {
             SignerCredentials creds = (SignerCredentials) credentials;
-
             String fingerprint = this.getParameter(Constants.FINGERPRINT);
             String sessionId = this.getParameter(Constants.NONCE);
 
@@ -43,16 +41,12 @@ public final class Http3SSHKeyAuthScheme extends RFC2617Scheme {
 
             Challenge challenge = new Challenge(this.getRealm(), fingerprint, sessionId, host, userAgent);
 
-            try {
-                Signer signer = creds.getSigner();
-                if (signer != null) {
-                    Authorization authorization = creds.getSigner().sign(challenge);
-                    if (authorization != null) {
-                        return authorization.toString();
-                    }
+            Signer signer = creds.getSigner();
+            if (signer != null) {
+                Authorization authorization = creds.getSigner().sign(challenge);
+                if (authorization != null) {
+                    return authorization.toString();
                 }
-            } catch (SignerException e) {
-                throw new AuthenticationException("Failed to sign challenge", e);
             }
         }
 

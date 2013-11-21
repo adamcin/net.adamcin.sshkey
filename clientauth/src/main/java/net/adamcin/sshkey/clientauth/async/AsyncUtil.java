@@ -20,10 +20,10 @@ import java.util.concurrent.TimeoutException;
 
 public final class AsyncUtil {
 
-    public static void setHeaders(AsyncHttpClient.BoundRequestBuilder builder, Signer signer, String username) {
+    public static void setHeaders(AsyncHttpClient.BoundRequestBuilder builder, Signer signer, String loginId) {
         if (builder != null) {
             Map<String, Collection<String>> headers = new HashMap<String, Collection<String>>();
-            headers.put(Constants.SSHKEY_USERNAME, Arrays.asList(username));
+            headers.put(Constants.SSHKEY_LOGIN_ID, Arrays.asList(loginId));
 
             if (signer != null) {
                 headers.put(Constants.SSHKEY_FINGERPRINT, signer.getFingerprints());
@@ -35,21 +35,21 @@ public final class AsyncUtil {
         }
     }
 
-    public static Response login(final String loginUri, final Signer signer, final String username,
+    public static Response login(final String loginUri, final Signer signer, final String loginId,
                                 final AsyncHttpClient client, final boolean checkTimeout, final long timeoutRemaining)
             throws IOException {
 
-        return login(loginUri, signer, username, client, checkTimeout, timeoutRemaining, new AsyncCompletionHandlerBase(), null);
+        return login(loginUri, signer, loginId, client, checkTimeout, timeoutRemaining, new AsyncCompletionHandlerBase(), null);
     }
 
-    public static <T> T login(final String loginUri, final Signer signer, final String username,
+    public static <T> T login(final String loginUri, final Signer signer, final String loginId,
                                 final AsyncHttpClient client, final boolean checkTimeout, final long timeoutRemaining,
                                 AsyncCompletionHandler<T> handler, RequestBuilderDecorator loginRequestDecorator)
             throws IOException {
 
         final AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareGet(loginUri).setUrl(loginUri);
 
-        setHeaders(requestBuilder, signer, username);
+        setHeaders(requestBuilder, signer, loginId);
         final Request request = requestBuilder.build();
 
         ListenableFuture<T> future = client.executeRequest(request, new LoginChallengeHandler<T>(signer, client,

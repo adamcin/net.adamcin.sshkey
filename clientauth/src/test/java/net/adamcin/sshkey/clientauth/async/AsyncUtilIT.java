@@ -4,12 +4,15 @@ import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
 import net.adamcin.commons.testing.junit.TestBody;
-import net.adamcin.sshkey.clientauth.KeyTestUtil;
 import net.adamcin.sshkey.api.Signer;
-import net.adamcin.sshkey.api.SignerFactory;
+import net.adamcin.sshkey.simple.JCEIdentity;
+import net.adamcin.sshkey.simple.KeyFormat;
+import net.adamcin.sshkey.simple.SimpleIdentityProvider;
+import net.adamcin.sshkey.testutil.KeyTestUtil;
 import org.junit.Test;
 
 import java.io.File;
+import java.security.KeyPair;
 
 import static org.junit.Assert.*;
 
@@ -28,11 +31,13 @@ public class AsyncUtilIT {
             @Override
             protected void execute() throws Exception {
 
-                Signer signer = SignerFactory.getFactoryInstance().getInstance();
 
-                File keyFile = KeyTestUtil.getPrivateKeyAsFile("b2048", "id_rsa");
+                KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
 
-                signer.addLocalKey(keyFile.getPath(), null);
+                SimpleIdentityProvider provider = new SimpleIdentityProvider();
+                provider.add(new JCEIdentity(KeyFormat.SSH_RSA, keyPair));
+
+                Signer signer = new Signer(provider);
 
                 AsyncHttpClient client = new AsyncHttpClient();
 

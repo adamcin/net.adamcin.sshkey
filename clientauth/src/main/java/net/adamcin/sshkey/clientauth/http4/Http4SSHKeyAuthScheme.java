@@ -4,7 +4,6 @@ import net.adamcin.sshkey.api.Authorization;
 import net.adamcin.sshkey.api.Challenge;
 import net.adamcin.sshkey.api.Constants;
 import net.adamcin.sshkey.api.Signer;
-import net.adamcin.sshkey.api.SignerException;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.auth.AuthenticationException;
@@ -45,14 +44,10 @@ public final class Http4SSHKeyAuthScheme extends RFC2617Scheme {
 
         Challenge challenge = new Challenge(this.getRealm(), fingerprint, nonce, host, userAgent);
 
-        try {
-            Authorization authorization = this.signer.sign(challenge);
-            if (authorization != null) {
-                return new BasicHeader(Constants.AUTHORIZATION,
-                                       authorization.toString());
-            }
-        } catch (SignerException e) {
-            throw new AuthenticationException("Failed to sign challenge", e);
+        Authorization authorization = this.signer.sign(challenge);
+        if (authorization != null) {
+            return new BasicHeader(Constants.AUTHORIZATION,
+                                   authorization.toString());
         }
 
         return null;
