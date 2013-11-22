@@ -4,6 +4,7 @@ import net.adamcin.sshkey.api.Constants;
 import net.adamcin.sshkey.api.Signer;
 import org.apache.http.auth.AuthScheme;
 import org.apache.http.auth.AuthSchemeFactory;
+import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -28,10 +29,11 @@ public final class Http4Util {
 
         client.getAuthSchemes().register(Constants.SCHEME, new AuthSchemeFactory() {
             public AuthScheme newInstance(HttpParams params) {
-                return new Http4SSHKeyAuthScheme(signer);
+                return new Http4SSHKeyAuthScheme();
             }
         });
 
+        client.getCredentialsProvider().setCredentials(AuthScope.ANY, new SignerCredentials(signer));
         client.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF,
                                         Arrays.asList(Constants.SCHEME));
 

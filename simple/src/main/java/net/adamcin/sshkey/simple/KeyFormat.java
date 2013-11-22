@@ -30,15 +30,10 @@ package net.adamcin.sshkey.simple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Signature;
-import java.security.interfaces.DSAParams;
-import java.security.interfaces.DSAPublicKey;
 
 /**
  *

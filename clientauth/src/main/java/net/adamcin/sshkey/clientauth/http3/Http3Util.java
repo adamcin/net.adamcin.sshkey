@@ -33,7 +33,11 @@ public final class Http3Util {
         AuthPolicy.registerAuthScheme(Constants.SCHEME, Http3SSHKeyAuthScheme.class);
         List<String> schemes = new ArrayList<String>();
         schemes.add(Constants.SCHEME);
-        schemes.addAll((Collection) DefaultHttpParams.getDefaultParams().getParameter(AuthPolicy.AUTH_SCHEME_PRIORITY));
+
+        Collection authSchemePriority = (Collection) DefaultHttpParams.getDefaultParams().getParameter(AuthPolicy.AUTH_SCHEME_PRIORITY);
+        if (authSchemePriority != null) {
+            schemes.addAll(authSchemePriority);
+        }
         client.getParams().setParameter(AuthPolicy.AUTH_SCHEME_PRIORITY, schemes);
     }
 

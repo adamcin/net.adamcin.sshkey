@@ -13,11 +13,6 @@ import org.apache.http.message.BasicHeader;
 
 public final class Http4SSHKeyAuthScheme extends RFC2617Scheme {
 
-    private Signer signer;
-
-    public Http4SSHKeyAuthScheme(Signer signer) {
-        this.signer = signer;
-    }
 
     public String getSchemeName() {
         return Constants.SCHEME;
@@ -34,20 +29,25 @@ public final class Http4SSHKeyAuthScheme extends RFC2617Scheme {
     public Header authenticate(Credentials credentials, HttpRequest request)
             throws AuthenticationException {
 
-        String fingerprint = this.getParameter(Constants.FINGERPRINT);
-        String nonce = this.getParameter(Constants.NONCE);
+        if (credentials instanceof SignerCredentials) {
+            Signer signer = ((SignerCredentials) credentials).getSigner();
+            String fingerprint = this.getParameter(Constants.FINGERPRINT);
+            String nonce = this.getParameter(Constants.NONCE);
 
-        Header hostHeader = request.getFirstHeader(Constants.HOST);
-        Header userAgentHeader = request.getFirstHeader(Constants.USER_AGENT);
-        String host = hostHeader != null ? hostHeader.getValue() : "";
-        String userAgent = userAgentHeader != null ? userAgentHeader.getValue() : "";
+            Header hostHeader = request.getFirstHeader(Constants.HOST);
+            Header userAgentHeader = request.getFirstHeader(Constants.USER_AGENT);
+            String host = hostHeader != null ? hostHeader.getValue() : "";
+            String userAgent = userAgentHeader != null ? userAgentHeader.getValue() : "";
 
-        Challenge challenge = new Challenge(this.getRealm(), fingerprint, nonce, host, userAgent);
+            Challenge challenge = new Challenge(this.getRealm(), fingerprint, nonce, host, userAgent);
 
-        Authorization authorization = this.signer.sign(challenge);
-        if (authorization != null) {
-            return new BasicHeader(Constants.AUTHORIZATION,
-                                   authorization.toString());
+            Authorization authorization = signer.sign(challenge);
+            if (authorization != null) {
+                return new BasicHeader(
+                        Constants.AUTHORIZATION,
+                        authorization.toString()
+                );
+            }
         }
 
         return null;

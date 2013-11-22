@@ -92,15 +92,10 @@ public final class LoginChallengeHandler <T> extends AsyncCompletionHandler<T> {
                     ListenableFuture<T> authFuture = client.executeRequest(authRequest, delegatee);
 
                     return authFuture.get();
-                } else {
-                    throw new Exception("Signing identity not found");
                 }
-            } else {
-                throw new Exception("SSHKey login not available");
             }
-
-        } else {
-            return delegatee.onCompleted(response);
         }
+
+        return delegatee.onCompleted(response);
     }
 }
