@@ -27,27 +27,27 @@
 
 package net.adamcin.sshkey.api;
 
+public class MockKey implements Key {
 
-import org.junit.Test;
+    String fingerprint = null;
 
-import static org.junit.Assert.*;
-
-public class VerifierTest {
-
-    @Test
-    public void testVerify() {
-        String fingerprint = "fingerprint";
-        String sessionId = "sessionId";
-        String host = "localhost";
-        String userAgent = "test";
-
-        Keychain identities = new MockKeychain(fingerprint);
-        Verifier v = new Verifier(identities);
-        Challenge c = new Challenge(VerifierTest.class.getName(), fingerprint, sessionId, host, userAgent);
-        Authorization a = new Authorization(c.getNonce(), MockKey.mockSign(c.getHashBytes()));
-
-        assertTrue("default verifier should verify mock signature ", v.verify(c, a));
+    public MockKey(String fingerprint) {
+        this.fingerprint = fingerprint;
     }
 
+    public String getFingerprint() {
+        return fingerprint;
+    }
 
+    public boolean verify(byte[] challengeHash, byte[] signatureBytes) {
+        return new StringBuilder(new String(signatureBytes, Constants.CHARSET)).reverse().toString().equals(new String(challengeHash, Constants.CHARSET));
+    }
+
+    public byte[] sign(byte[] challengeHash) {
+        return sign(challengeHash);
+    }
+
+    public static byte[] mockSign(byte[] challengeHash) {
+        return new StringBuilder(new String(challengeHash, Constants.CHARSET)).reverse().toString().getBytes(Constants.CHARSET);
+    }
 }

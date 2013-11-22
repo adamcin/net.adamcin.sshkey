@@ -27,27 +27,26 @@
 
 package net.adamcin.sshkey.api;
 
+public interface Key {
 
-import org.junit.Test;
+    /**
+     * A {@link Key} is identified by its fingerprint
+     * @return the key's fingerprint
+     */
+    String getFingerprint();
 
-import static org.junit.Assert.*;
+    /**
+     * Verifies the {@code signatureBytes} against the {@code challengeHash} using an underlying public key
+     * @param challengeHash the result of {@link net.adamcin.sshkey.api.Challenge#getHashBytes()}
+     * @param signatureBytes the result of {@link net.adamcin.sshkey.api.Authorization#getSignatureBytes()}
+     * @return true if signature is valid
+     */
+    boolean verify(byte[] challengeHash, byte[] signatureBytes);
 
-public class VerifierTest {
-
-    @Test
-    public void testVerify() {
-        String fingerprint = "fingerprint";
-        String sessionId = "sessionId";
-        String host = "localhost";
-        String userAgent = "test";
-
-        Keychain identities = new MockKeychain(fingerprint);
-        Verifier v = new Verifier(identities);
-        Challenge c = new Challenge(VerifierTest.class.getName(), fingerprint, sessionId, host, userAgent);
-        Authorization a = new Authorization(c.getNonce(), MockKey.mockSign(c.getHashBytes()));
-
-        assertTrue("default verifier should verify mock signature ", v.verify(c, a));
-    }
-
-
+    /**
+     *
+     * @param challengeHash the result of {@link net.adamcin.sshkey.api.Challenge#getHashBytes()}
+     * @return byte array containing the challengeHash signature or null if a signature could not be generated.
+     */
+    byte[] sign(byte[] challengeHash);
 }

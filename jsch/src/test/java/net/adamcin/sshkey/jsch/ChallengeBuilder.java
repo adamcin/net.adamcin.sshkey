@@ -25,29 +25,31 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.sshkey.api;
+package net.adamcin.sshkey.jsch;
 
+import net.adamcin.sshkey.api.Challenge;
 
-import org.junit.Test;
+/**
+ * Created with IntelliJ IDEA.
+ * User: madamcin
+ * Date: 11/15/13
+ * Time: 9:31 AM
+ * To change this template use File | Settings | File Templates.
+ */
+public final class ChallengeBuilder {
+    private final String realm;
+    private final String nonce;
+    private final String host;
+    private final String userAgent;
 
-import static org.junit.Assert.*;
-
-public class VerifierTest {
-
-    @Test
-    public void testVerify() {
-        String fingerprint = "fingerprint";
-        String sessionId = "sessionId";
-        String host = "localhost";
-        String userAgent = "test";
-
-        Keychain identities = new MockKeychain(fingerprint);
-        Verifier v = new Verifier(identities);
-        Challenge c = new Challenge(VerifierTest.class.getName(), fingerprint, sessionId, host, userAgent);
-        Authorization a = new Authorization(c.getNonce(), MockKey.mockSign(c.getHashBytes()));
-
-        assertTrue("default verifier should verify mock signature ", v.verify(c, a));
+    public ChallengeBuilder(String realm, String nonce, String host, String userAgent) {
+        this.realm = realm;
+        this.nonce = nonce;
+        this.host = host;
+        this.userAgent = userAgent;
     }
 
-
+    public Challenge build(String fingerprint) {
+        return new Challenge(realm, fingerprint, nonce, host, userAgent);
+    }
 }

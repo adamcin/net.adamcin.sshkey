@@ -27,9 +27,6 @@
 
 package net.adamcin.sshkey.api;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,20 +35,19 @@ import java.util.Set;
  * Instance of a Signer, used by an HTTP client to sign a {@link Challenge} and create an {@link Authorization}
  */
 public final class Signer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Signer.class);
 
-    private final IdentityProvider identityProvider;
+    private final Keychain keychain;
 
     public Signer() {
         this(null);
     }
 
-    public Signer(IdentityProvider identityProvider) {
-        this.identityProvider = identityProvider != null ? identityProvider : Constants.EMPTY_PROVIDER;
+    public Signer(Keychain keychain) {
+        this.keychain = keychain != null ? keychain : new DefaultKeychain();
     }
 
-    public IdentityProvider getIdentityProvider() {
-        return identityProvider;
+    public Keychain getKeychain() {
+        return keychain;
     }
 
     /**
@@ -59,13 +55,11 @@ public final class Signer {
      */
     public Set<String> getFingerprints() {
         Set<String> fingerprints = new HashSet<String>();
-        Set<String> _fingerprints = this.identityProvider.fingerprints();
+        Set<String> _fingerprints = this.keychain.fingerprints();
         if (_fingerprints != null) {
             for (String fingerprint : _fingerprints) {
                 if (Constants.validateFingerprint(fingerprint)) {
                     fingerprints.add(fingerprint);
-                } else {
-                    LOGGER.info("[getFingerprints] fingerprint is invalid: {}", fingerprint);
                 }
             }
         }
@@ -80,10 +74,10 @@ public final class Signer {
     public Authorization sign(Challenge challenge) {
         if (challenge != null) {
 
-            Identity identity = this.identityProvider.get(challenge.getFingerprint());
+            Key key = this.keychain.get(challenge.getFingerprint());
 
-            if (identity != null) {
-                byte[] signature = identity.sign(challenge.getHashBytes());
+            if (key != null) {
+                byte[] signature = key.sign(challenge.getHashBytes());
 
                 if (signature != null) {
                     return new Authorization(challenge.getNonce(), signature);

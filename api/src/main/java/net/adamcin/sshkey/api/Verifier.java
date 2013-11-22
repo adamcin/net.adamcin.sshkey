@@ -34,30 +34,30 @@ import java.util.Collection;
  */
 public final class Verifier {
 
-    private IdentityProvider identityProvider;
+    private Keychain keychain;
 
     public Verifier() {
         this(null);
     }
 
-    public Verifier(IdentityProvider identityProvider) {
-        this.identityProvider = identityProvider != null ? identityProvider : Constants.EMPTY_PROVIDER;
+    public Verifier(Keychain keychain) {
+        this.keychain = keychain != null ? keychain : new DefaultKeychain();
     }
 
-    public IdentityProvider getIdentityProvider() {
-        return identityProvider;
+    public Keychain getKeychain() {
+        return keychain;
     }
 
     /**
      * Selects a public key fingerprint from those offered by the client based on what is available from the
-     * {@link IdentityProvider}
+     * {@link Keychain}
      * @param fingerprints a collection of fingerprints offered in the client request
      * @return a single preferred public key fingerprint, or null if none match
      */
     public String select(Collection<String> fingerprints) {
         if (fingerprints != null) {
             for (String fingerprint : fingerprints) {
-                if (Constants.validateFingerprint(fingerprint) && identityProvider.contains(fingerprint)) {
+                if (Constants.validateFingerprint(fingerprint) && keychain.contains(fingerprint)) {
                     return fingerprint;
                 }
             }
@@ -76,7 +76,7 @@ public final class Verifier {
             return false;
         }
 
-        Identity identity = identityProvider.get(challenge.getFingerprint());
-        return identity != null && identity.verify(challenge.getHashBytes(), authorization.getSignatureBytes());
+        Key key = keychain.get(challenge.getFingerprint());
+        return key != null && key.verify(challenge.getHashBytes(), authorization.getSignatureBytes());
     }
 }

@@ -445,16 +445,12 @@ public final class Base64
     private Base64(){}
 
     public static String toBase64String(final byte[] data) {
-        return toBase64String(data, true);
-    }
-
-    public static String toBase64String(final byte[] data, boolean urlSafe) {
         if (data == null) {
             return null;
         }
 
         try {
-            return encodeBytes(data, urlSafe ? URL_SAFE : NO_OPTIONS);
+            return encodeBytes(data, NO_OPTIONS);
         } catch (IOException e) {
             e.printStackTrace(System.err);
             return null;
@@ -462,16 +458,12 @@ public final class Base64
     }
 
     public static byte[] fromBase64String(final String encoded) {
-        return fromBase64String(encoded, true);
-    }
-
-    public static byte[] fromBase64String(final String encoded, boolean urlSafe) {
         if (encoded == null) {
             return new byte[0];
         }
 
         try {
-            return decode(encoded, urlSafe ? URL_SAFE : NO_OPTIONS);
+            return decode(encoded, NO_OPTIONS);
         } catch (IOException e) {
             e.printStackTrace(System.err);
             return new byte[0];
@@ -479,17 +471,12 @@ public final class Base64
     }
 
     public static byte[] fromBase64(final byte[] pArray) {
-        return fromBase64(pArray, true);
-    }
-
-
-    public static byte[] fromBase64(final byte[] pArray, boolean urlSafe) {
         if (pArray == null) {
             return null;
         }
 
         try {
-            return decode(pArray, 0, pArray.length, urlSafe ? URL_SAFE : NO_OPTIONS);
+            return decode(pArray, 0, pArray.length, NO_OPTIONS);
         } catch (IOException e) {
             e.printStackTrace(System.err);
             return new byte[0];

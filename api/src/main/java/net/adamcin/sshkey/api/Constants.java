@@ -112,12 +112,12 @@ public final class Constants {
     /**
      *
      */
-    public static final IdentityProvider EMPTY_PROVIDER = new IdentityProvider() {
+    public static final Keychain EMPTY_PROVIDER = new Keychain() {
         public boolean contains(String fingerprint) {
             return false;
         }
 
-        public Identity get(String fingerprint) {
+        public Key get(String fingerprint) {
             return null;
         }
 

@@ -54,9 +54,9 @@
     <modules>
         <module>api</module>
         <module>test-common</module>
-        <module>simple</module>
+        <module>jce</module>
+        <module>jsch</module>
         <module>clientauth</module>
-        <module>provider/jsch</module>
         <module>clitool</module>
     </modules>
 
@@ -254,12 +254,12 @@
             </dependency>
             <dependency>
                 <groupId>net.adamcin.sshkey</groupId>
-                <artifactId>sshkey-simple</artifactId>
+                <artifactId>sshkey-jce</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.sshkey</groupId>
-                <artifactId>net.adamcin.sshkey.provider.jsch</artifactId>
+                <artifactId>sshkey-jsch</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>

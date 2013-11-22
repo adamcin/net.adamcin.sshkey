@@ -195,7 +195,7 @@ public class KeyTestUtilTest {
 
     private void testPublicKeyMatchesAuthorizedKey(String parentName, String keyName) {
         String realEncoded = Base64.toBase64String(
-                KeyTestUtil.dumpKeyBlob(KeyTestUtil.getKeyPairFromProperties(parentName, keyName).getPublic()), false
+                KeyTestUtil.dumpKeyBlob(KeyTestUtil.getKeyPairFromProperties(parentName, keyName).getPublic())
         );
 
         Scanner pubScanner = null;

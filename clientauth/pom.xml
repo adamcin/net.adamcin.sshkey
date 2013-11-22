@@ -125,17 +125,12 @@
 
         <dependency>
             <groupId>net.adamcin.sshkey</groupId>
-            <artifactId>sshkey-simple</artifactId>
+            <artifactId>sshkey-jce</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.adamcin.sshkey</groupId>
             <artifactId>sshkey-test-common</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.adamcin.sshkey</groupId>
-            <artifactId>net.adamcin.sshkey.provider.jsch</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

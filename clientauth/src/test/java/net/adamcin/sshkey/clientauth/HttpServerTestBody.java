@@ -6,7 +6,7 @@ import net.adamcin.sshkey.api.Base64;
 import net.adamcin.sshkey.api.Challenge;
 import net.adamcin.sshkey.api.Constants;
 import net.adamcin.sshkey.api.Verifier;
-import net.adamcin.sshkey.simple.AuthorizedKeys;
+import net.adamcin.sshkey.jce.AuthorizedKeys;
 import net.adamcin.sshkey.testutil.KeyTestUtil;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
