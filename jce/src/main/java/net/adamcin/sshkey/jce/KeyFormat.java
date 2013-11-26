@@ -27,6 +27,7 @@
 
 package net.adamcin.sshkey.jce;
 
+import net.adamcin.sshkey.api.Algorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,36 +35,44 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
  */
 public enum KeyFormat {
 
-    SSH_DSS("ssh-dss", "DSA", "SHA1withDSA", FingerprintGenerator.DSA, SignatureDecorator.DSA),
-    SSH_RSA("ssh-rsa", "RSA", "SHA1withRSA", FingerprintGenerator.RSA, SignatureDecorator.RSA),
-    UNKOWN("_unknown_", "_unknown_", "_unknown_", new FingerprintGenerator() {
-        @Override String getFingerprint(PublicKey publicKey) { return ""; }
-    }, new SignatureDecorator() {
-        @Override byte[] postSign(byte[] signatureBytes) { return signatureBytes; }
-        @Override byte[] preVerify(byte[] signatureBytes) { return signatureBytes; }
-    });
+    SSH_DSS(
+            "ssh-dss", "DSA", FingerprintGenerator.DSA, Algorithm.SSH_DSS,
+            Collections.unmodifiableSet(new HashSet<Algorithm>(Arrays.asList(Algorithm.SSH_DSS, Algorithm.DSA_SHA1)))
+    ),
+    SSH_RSA(
+            "ssh-rsa", "RSA", FingerprintGenerator.RSA, Algorithm.SSH_RSA, Collections.unmodifiableSet(
+            new HashSet<Algorithm>(
+                    Arrays.asList(Algorithm.SSH_RSA, Algorithm.RSA_SHA1, Algorithm.RSA_SHA256, Algorithm.RSA_SHA512)
+            )
+    )
+    ),
+    UNKOWN("_unknown_", "_unknown_", FingerprintGenerator.NOP, null, Collections.<Algorithm>emptySet());
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyFormat.class);
 
     private final String identifier;
     private final String keyAlgorithm;
-    private final String signatureAlgorithm;
+    private final Algorithm defaultSignature;
+    private final Set<Algorithm> signatureAlgorithms;
     private final FingerprintGenerator fingerprintGenerator;
-    private final SignatureDecorator signatureDecorator;
 
-    private KeyFormat(String identifier, String keyAlgorithm, String signatureAlgorithm,
-                      FingerprintGenerator fingerprintGenerator, SignatureDecorator signatureDecorator) {
+    private KeyFormat(String identifier, String keyAlgorithm, FingerprintGenerator fingerprintGenerator,
+                      Algorithm defaultSignature, Set<Algorithm> signatureAlgorithms) {
         this.identifier = identifier;
         this.keyAlgorithm = keyAlgorithm;
-        this.signatureAlgorithm = signatureAlgorithm;
         this.fingerprintGenerator = fingerprintGenerator;
-        this.signatureDecorator = signatureDecorator;
+        this.defaultSignature = defaultSignature;
+        this.signatureAlgorithms = signatureAlgorithms;
     }
 
     public String getIdentifier() {
@@ -85,30 +94,43 @@ public enum KeyFormat {
         return null;
     }
 
-    public String getSignatureAlgorithm() {
-        return signatureAlgorithm;
+    public Set<Algorithm> getSignatureAlgorithms() {
+        return signatureAlgorithms;
     }
 
     public String getFingerprint(PublicKey publicKey) {
         return fingerprintGenerator.getFingerprint(publicKey);
     }
 
-    public Signature getSignatureInstance() {
-        try {
-            return Signature.getInstance(getSignatureAlgorithm());
-        } catch (NoSuchAlgorithmException e) {
-            LOGGER.error("[getSignatureInstance] failed to get signature instance.", e);
+    public Signature getSignatureInstance(Algorithm algorithm) {
+        return getSignatureInstanceInternal(algorithm != null ? algorithm : defaultSignature);
+    }
+
+    private static Signature getSignatureInstanceInternal(Algorithm algorithm) {
+        if (algorithm != null) {
+            try {
+                switch (algorithm) {
+                    case SSH_DSS:
+                        return new SSHDSSSignature();
+                    case SSH_RSA:
+                        return new SSHRSASignature();
+                    case RSA_SHA1:
+                        return Signature.getInstance("SHA1withRSA");
+                    case RSA_SHA256:
+                        return Signature.getInstance("SHA256withRSA");
+                    case RSA_SHA512:
+                        return Signature.getInstance("SHA512withRSA");
+                    case DSA_SHA1:
+                        return Signature.getInstance("SHA1withDSA");
+                    default:
+                        return null;
+                }
+            } catch (NoSuchAlgorithmException e) {
+                LOGGER.error("[getSignatureInstance] failed to get signature instance.", e);
+            }
         }
 
         return null;
-    }
-
-    public byte[] postSign(byte[] signatureBytes) {
-        return signatureDecorator.postSign(signatureBytes);
-    }
-
-    public byte[] preVerify(byte[] signatureBytes) {
-        return signatureDecorator.preVerify(signatureBytes);
     }
 
     public static KeyFormat forIdentifier(String identifier) {

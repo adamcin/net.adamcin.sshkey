@@ -32,6 +32,6 @@ public class MockKeychain implements Keychain {
     }
 
     public Set<String> fingerprints() {
-        return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(mockIdentity.getFingerprint())));
+        return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(mockIdentity.getId())));
     }
 }

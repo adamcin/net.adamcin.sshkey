@@ -35,12 +35,12 @@ import java.util.Set;
  * Constant values used by the SSHKey Specification
  */
 public final class Constants {
-    public static final Charset CHARSET_LOGIN_ID = Charset.forName("UTF-8");
+
 
     /**
-     * Identifier for the SSH Key Authentication scheme
+     * Identifier for the Signature Authentication scheme
      */
-    public static final String SCHEME = "SSHKey";
+    public static final String SCHEME = "Signature";
 
     /**
      * Http response header representing a server authentication challenge
@@ -89,7 +89,15 @@ public final class Constants {
      */
     public static final String SSHKEY_FINGERPRINT = "X-SSHKey-Fingerprint";
 
+    /**
+     *
+     */
     public static final Charset CHARSET = Charset.forName("ISO-8859-1");
+
+    /**
+     *
+     */
+    public static final Charset CHARSET_LOGIN_ID = Charset.forName("UTF-8");
 
     /**
      * Checks the provided fingerprint for lexical conformance
@@ -108,31 +116,23 @@ public final class Constants {
         }
     }
 
-
-    /**
-     *
-     */
-    public static final Keychain EMPTY_PROVIDER = new Keychain() {
-        public boolean contains(String fingerprint) {
-            return false;
-        }
-
-        public Key get(String fingerprint) {
-            return null;
-        }
-
-        public Set<String> fingerprints() {
-            return Collections.emptySet();
-        }
-    };
-
     private Constants() {
     }
 
+    /**
+     *
+     * @param loginId
+     * @return
+     */
     public static String encodeLoginId(String loginId) {
         return Base64.toBase64String(loginId.getBytes(CHARSET_LOGIN_ID));
     }
 
+    /**
+     *
+     * @param encodedLoginId
+     * @return
+     */
     public static String decodeLoginId(String encodedLoginId) {
         return new String(Base64.fromBase64String(encodedLoginId), CHARSET_LOGIN_ID);
     }

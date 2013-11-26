@@ -1,4 +1,4 @@
-package net.adamcin.sshkey.api;
+package net.adamcin.sshkey.jce;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -43,27 +43,32 @@ public final class Magic {
         return null;
     }
 
-    public static byte[] extractSignature(byte[] signatureBytes) {
+    public static byte[] extractSignatureFromDER(byte[] signatureBytes) {
         if (signatureBytes[0] == 0 && signatureBytes[1] == 0 && signatureBytes[2] == 0) {
             int i = 0;
-            int j;
+            int j; // length decoder
             j =     ((signatureBytes[i++] << 24) & 0xff000000) |
                     ((signatureBytes[i++] << 16) & 0x00ff0000) |
                     ((signatureBytes[i++] <<  8) & 0x0000ff00) |
                     ((signatureBytes[i++]      ) & 0x000000ff);
-            i += j;
+            i += j; // i == index after first field length + value
             j =     ((signatureBytes[i++] << 24) & 0xff000000) |
                     ((signatureBytes[i++] << 16) & 0x00ff0000) |
-                    ((signatureBytes[i++] << 8 ) & 0x0000ff00) |
+                    ((signatureBytes[i++] <<  8) & 0x0000ff00) |
                     ((signatureBytes[i++]      ) & 0x000000ff);
-            byte[] tmp = new byte[j];
-            System.arraycopy(signatureBytes, i, tmp, 0, j);
+            byte[] tmp = new byte[j]; // i == index of second field value, j == length of second field value
+            System.arraycopy(signatureBytes, i, tmp, 0, j); //
             signatureBytes = tmp;
         }
         return signatureBytes;
     }
 
-    public static byte[] encodeASN1(byte[] signatureBytes) {
+    /**
+     * Pad {@code r} and {@code s} to 160-bit (20 byte) integers
+     * @param signatureBytes
+     * @return
+     */
+    public static byte[] dssPadSignature(byte[] signatureBytes) {
         // sig is in ASN.1
         // SEQUENCE::={ r INTEGER, s INTEGER }
         int len = 0;
@@ -95,7 +100,12 @@ public final class Magic {
 
     }
 
-    public static byte[] decodeASN1(byte[] signatureBytes) {
+    /**
+     * Remove padding from 160-bit integers, {@code r} and {@code s}
+     * @param signatureBytes
+     * @return
+     */
+    public static byte[] dssUnpadSignature(byte[] signatureBytes) {
         // ASN.1
         int frst = ((signatureBytes[0] & 0x80) != 0 ? 1 : 0);
         int scnd = ((signatureBytes[20] & 0x80) != 0 ? 1 : 0);

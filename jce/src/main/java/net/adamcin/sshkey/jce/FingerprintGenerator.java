@@ -1,6 +1,5 @@
 package net.adamcin.sshkey.jce;
 
-import net.adamcin.sshkey.api.Magic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +15,10 @@ public abstract class FingerprintGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(FingerprintGenerator.class);
 
     abstract String getFingerprint(PublicKey publicKey);
+
+    public static final FingerprintGenerator NOP = new FingerprintGenerator() {
+        @Override String getFingerprint(PublicKey publicKey) { return ""; }
+    };
 
     public static final FingerprintGenerator DSA = new FingerprintGenerator() {
         public String getFingerprint(PublicKey publicKey) {
