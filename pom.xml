@@ -55,6 +55,7 @@
         <module>api</module>
         <module>test-common</module>
         <module>jce</module>
+        <module>bouncycastle</module>
         <module>jsch</module>
         <module>clientauth</module>
         <module>clitool</module>
@@ -255,6 +256,11 @@
             <dependency>
                 <groupId>net.adamcin.sshkey</groupId>
                 <artifactId>sshkey-jce</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.adamcin.sshkey</groupId>
+                <artifactId>sshkey-bouncycastle</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
