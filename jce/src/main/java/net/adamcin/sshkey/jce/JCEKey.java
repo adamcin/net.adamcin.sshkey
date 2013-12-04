@@ -27,6 +27,7 @@
 
 package net.adamcin.sshkey.jce;
 
+import net.adamcin.sshkey.api.Algorithm;
 import net.adamcin.sshkey.api.Key;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.util.Set;
 
 /**
  * Default {@link net.adamcin.sshkey.api.Key} implementation for OpenSSH-compliant keys (RSA/DSA)
@@ -73,14 +75,18 @@ public final class JCEKey implements Key {
     /**
      * {@inheritDoc}
      */
-    public String getFingerprint() {
+    public String getId() {
         return this.fingerprint;
+    }
+
+    public Set<Algorithm> getAlgorithms() {
+        return keyFormat.getSignatureAlgorithms();
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean verify(byte[] challengeHash, byte[] signatureBytes) {
+    public boolean verify(Algorithm algorithm, byte[] challengeHash, byte[] signatureBytes) {
         if (challengeHash == null) {
             throw new IllegalArgumentException("challengeHash cannot be null.");
         }
@@ -93,16 +99,17 @@ public final class JCEKey implements Key {
             LOGGER.warn("[verify] this identity cannot be used for verification because it lacks a public key.");
         }
 
-        try {
-            byte[] sig = keyFormat.preVerify(signatureBytes);
-            Signature signature = keyFormat.getSignatureInstance();
-            signature.initVerify(keyPair.getPublic());
-            signature.update(challengeHash);
-            return signature.verify(sig);
-        } catch (SignatureException e) {
-            LOGGER.error("[verify] failed to verify signature.", e);
-        } catch (InvalidKeyException e) {
-            LOGGER.error("[verify] failed to verify signature due to invalid public key.", e);
+        Signature signature = keyFormat.getSignatureInstance(algorithm);
+        if (signature != null) {
+            try {
+                signature.initVerify(keyPair.getPublic());
+                signature.update(challengeHash);
+                return signature.verify(signatureBytes);
+            } catch (SignatureException e) {
+                LOGGER.error("[verify] failed to verify signature.", e);
+            } catch (InvalidKeyException e) {
+                LOGGER.error("[verify] failed to verify signature due to invalid public key.", e);
+            }
         }
 
         return false;
@@ -111,7 +118,7 @@ public final class JCEKey implements Key {
     /**
      * {@inheritDoc}
      */
-    public byte[] sign(byte[] challengeHash) {
+    public byte[] sign(Algorithm algorithm, byte[] challengeHash) {
         if (challengeHash == null) {
             throw new IllegalArgumentException("challengeHash cannot be null.");
         }
@@ -121,16 +128,17 @@ public final class JCEKey implements Key {
             return null;
         }
 
-        try {
-            Signature signature = keyFormat.getSignatureInstance();
-            signature.initSign(keyPair.getPrivate());
-            signature.update(challengeHash);
-            byte[] signatureBytes = signature.sign();
-            return keyFormat.postSign(signatureBytes);
-        } catch (SignatureException e) {
-            LOGGER.error("[sign] failed to sign challengeHash.", e);
-        } catch (InvalidKeyException e) {
-            LOGGER.error("[sign] failed to sign challengeHash due to invalid private key.", e);
+        Signature signature = keyFormat.getSignatureInstance(algorithm);
+        if (signature != null) {
+            try {
+                signature.initSign(keyPair.getPrivate());
+                signature.update(challengeHash);
+                return signature.sign();
+            } catch (SignatureException e) {
+                LOGGER.error("[sign] failed to sign challengeHash.", e);
+            } catch (InvalidKeyException e) {
+                LOGGER.error("[sign] failed to sign challengeHash due to invalid private key.", e);
+            }
         }
 
         return EMPTY_BYTES;

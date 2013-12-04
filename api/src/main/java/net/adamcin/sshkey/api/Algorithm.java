@@ -27,35 +27,42 @@
 
 package net.adamcin.sshkey.api;
 
-import java.util.Set;
+/**
+ * Created with IntelliJ IDEA.
+ * User: madamcin
+ * Date: 11/24/13
+ * Time: 1:42 PM
+ * To change this template use File | Settings | File Templates.
+ */
+public enum Algorithm {
+    RSA_SHA1("rsa-sha1"),
+    RSA_SHA256("rsa-sha256"),
+    RSA_SHA512("rsa-sha512"),
+    DSA_SHA1("dsa-sha1"),
+    HMAC_SHA1("hmac-sha1"),
+    HMAC_SHA256("hmac-sha256"),
+    HMAC_SHA512("hmac-sha512"),
+    SSH_RSA("ssh-rsa"),
+    SSH_DSS("ssh-dss");
 
-public interface Key {
+    private final String name;
 
-    /**
-     * A {@link Key} is identified by its fingerprint
-     * @return the key's fingerprint
-     */
-    String getId();
+    private Algorithm(String name) {
+        this.name = name;
+    }
 
-    /**
-     * @return the {@link Set} of Signature {@link Algorithm}s supported by this key.
-     */
-    Set<Algorithm> getAlgorithms();
+    public String getName() {
+        return name;
+    }
 
-    /**
-     * Verifies the {@code signatureBytes} against the {@code challengeHash} using an underlying public key
-     * @param algorithm the selected Signature {@link Algorithm}
-     * @param challengeHash the result of {@link net.adamcin.sshkey.api.Challenge#getHashBytes()}
-     * @param signatureBytes the result of {@link net.adamcin.sshkey.api.Authorization#getSignatureBytes()}
-     * @return true if signature is valid
-     */
-    boolean verify(Algorithm algorithm, byte[] challengeHash, byte[] signatureBytes);
+    public static Algorithm forName(String name) {
+        for (Algorithm algorithm : Algorithm.values()) {
+            if (algorithm.getName().equalsIgnoreCase(name)) {
+                return algorithm;
+            }
+        }
 
-    /**
-     * Signs the {@code challengeHash} using the specified signature {@link Algorithm}
-     * @param algorithm the selected Signature {@link Algorithm}
-     * @param challengeHash the result of {@link net.adamcin.sshkey.api.Challenge#getHashBytes()}
-     * @return byte array containing the challengeHash signature or null if a signature could not be generated.
-     */
-    byte[] sign(Algorithm algorithm, byte[] challengeHash);
+        return null;
+    }
+
 }

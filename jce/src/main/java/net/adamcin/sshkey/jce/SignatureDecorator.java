@@ -1,7 +1,5 @@
 package net.adamcin.sshkey.jce;
 
-import net.adamcin.sshkey.api.Magic;
-
 /**
  * Simple abstract class and key-format-specific adjustments to signatures performed by SSH clients.
  */
@@ -17,7 +15,7 @@ public abstract class SignatureDecorator {
 
         @Override
         byte[] preVerify(byte[] signatureBytes) {
-            final byte[] extracted = Magic.extractSignature(signatureBytes);
+            final byte[] extracted = Magic.extractSignatureFromDER(signatureBytes);
             return extracted;
         }
     };
@@ -25,13 +23,13 @@ public abstract class SignatureDecorator {
     public static final SignatureDecorator DSA = new SignatureDecorator() {
         @Override
         byte[] postSign(byte[] signatureBytes) {
-            return Magic.encodeASN1(signatureBytes);
+            return Magic.dssPadSignature(signatureBytes);
         }
 
         @Override
         byte[] preVerify(byte[] signatureBytes) {
-            final byte[] extracted = Magic.extractSignature(signatureBytes);
-            return Magic.decodeASN1(extracted);
+            final byte[] extracted = Magic.extractSignatureFromDER(signatureBytes);
+            return Magic.dssUnpadSignature(extracted);
         }
     };
 }

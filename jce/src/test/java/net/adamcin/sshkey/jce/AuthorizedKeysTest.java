@@ -122,7 +122,7 @@ public class AuthorizedKeysTest {
             Key jceKey = new JCEKey(format, keyPair);
             Key akKey = AuthorizedKeys.createPublicIdentity(publicPair);
 
-            assertEquals(id + "fingerprints should match", jceKey.getFingerprint(), akKey.getFingerprint());
+            assertEquals(id + "fingerprints should match", jceKey.getId(), akKey.getId());
 
             DefaultKeychain signingAndVerifying = new DefaultKeychain(Arrays.asList(jceKey));
             DefaultKeychain verifying = new DefaultKeychain(Arrays.asList(akKey));
@@ -135,7 +135,7 @@ public class AuthorizedKeysTest {
             final String host = "localhost";
             final String userAgent = "jUnit";
             final String sessionId = "session";
-            final String fingerprint = jceKey.getFingerprint();
+            final String fingerprint = jceKey.getId();
 
             Challenge challenge = new Challenge(realm, fingerprint, sessionId, host, userAgent);
 

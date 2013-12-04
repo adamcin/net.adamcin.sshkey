@@ -35,7 +35,7 @@ public class MockKey implements Key {
         this.fingerprint = fingerprint;
     }
 
-    public String getFingerprint() {
+    public String getId() {
         return fingerprint;
     }
 

@@ -51,10 +51,10 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
     }
 
     public boolean add(Key key) {
-        if (key == null || _identities.containsKey(key.getFingerprint())) {
+        if (key == null || _identities.containsKey(key.getId())) {
             return false;
         } else {
-            return _identities.put(key.getFingerprint(), key) != null;
+            return _identities.put(key.getId(), key) != null;
         }
     }
 

@@ -3,7 +3,7 @@ package net.adamcin.sshkey.api;
 import java.util.Set;
 
 /**
- *
+ * Self-reducing set of {@link Key}s
  */
 public interface Keychain {
 
@@ -16,7 +16,7 @@ public interface Keychain {
 
     /**
      * @param fingerprint a public key fingerprint
-     * @return an {@link Key} where {@code getFingerprint().equals(fingerprint)} or null if none exists
+     * @return an {@link Key} where {@code getId().equals(fingerprint)} or null if none exists
      */
     Key get(String fingerprint);
 
@@ -24,4 +24,20 @@ public interface Keychain {
      * @return a set containing each {@link Key}'s fingerprint
      */
     Set<String> fingerprints();
+
+    /**
+     * @return a reference to a {@link Keychain} which excludes the current {@link Key}.
+     */
+    Keychain discard();
+
+    /**
+     * @return a reference to the current {@link Key}.
+     */
+    Key get();
+
+    /**
+     *
+     * @return
+     */
+    boolean isEmpty();
 }

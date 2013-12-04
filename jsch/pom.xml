@@ -125,6 +125,10 @@
             <artifactId>sshkey-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>net.adamcin.sshkey</groupId>
+            <artifactId>sshkey-jce</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
 			<version>0.1.50</version>
@@ -143,11 +147,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.adamcin.sshkey</groupId>
-            <artifactId>sshkey-jce</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -33,15 +33,19 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Signature;
 import com.jcraft.jsch.jce.SignatureDSA;
 import com.jcraft.jsch.jce.SignatureRSA;
+import net.adamcin.sshkey.api.Algorithm;
 import net.adamcin.sshkey.api.Key;
 import net.adamcin.sshkey.api.Keychain;
 import net.adamcin.sshkey.api.DefaultKeychain;
-import net.adamcin.sshkey.api.Magic;
+import net.adamcin.sshkey.jce.Magic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -51,30 +55,45 @@ public class JschKey implements Key {
     private static final Logger LOGGER = LoggerFactory.getLogger(JschKey.class);
 
     private final String fingerprint;
+    private final Algorithm algorithm;
     private final Identity identity;
 
     public JschKey(Identity identity) {
         this.fingerprint = Magic.getFingerprint(identity.getPublicKeyBlob());
         this.identity = identity;
+        this.algorithm = Algorithm.forName(identity.getAlgName());
     }
 
-    public String getFingerprint() {
+    public String getId() {
         return this.fingerprint;
     }
 
-    public boolean verify(byte[] challengeHash, byte[] signatureBytes) {
-        try {
-            Signature signature = getSignature(challengeHash);
-            return signature.verify(signatureBytes);
-        } catch (Exception e) {
-            LOGGER.error("[verify] signature verification failed.", e);
+    public Set<Algorithm> getAlgorithms() {
+        return Collections.unmodifiableSet(this.algorithm == null ? new HashSet<Algorithm>() : new HashSet<Algorithm>(Arrays.asList(this.algorithm)));
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param algorithm the selected Signature {@link Algorithm}
+     * @param challengeHash the result of {@link net.adamcin.sshkey.api.Challenge#getHashBytes()}
+     * @param signatureBytes the result of {@link net.adamcin.sshkey.api.Authorization#getSignatureBytes()}
+     * @return
+     */
+    public boolean verify(Algorithm algorithm, byte[] challengeHash, byte[] signatureBytes) {
+        if (algorithm == this.algorithm) {
+            try {
+                Signature signature = getSignature(challengeHash);
+                return signature.verify(signatureBytes);
+            } catch (Exception e) {
+                LOGGER.error("[verify] signature verification failed.", e);
+            }
         }
 
         return false;
     }
 
     private Signature getSignature(byte[] challengeHash) throws Exception {
-        if ("ssh-rsa".equals(identity.getAlgName())) {
+        if (Algorithm.SSH_RSA == this.algorithm) {
             SignatureRSA signature = new SignatureRSA();
 
             Buffer buf = new Buffer(this.identity.getPublicKeyBlob());
@@ -86,7 +105,7 @@ public class JschKey implements Key {
             signature.setPubKey(e, n);
             signature.update(challengeHash);
             return signature;
-        } else if ("ssh-dss".equals(identity.getAlgName())) {
+        } else if (Algorithm.SSH_DSS == this.algorithm) {
             SignatureDSA signature = new SignatureDSA();
 
             Buffer buf = new Buffer(this.identity.getPublicKeyBlob());
@@ -105,7 +124,13 @@ public class JschKey implements Key {
         }
     }
 
-    public byte[] sign(byte[] challengeHash) {
+    /**
+     * {@inheritDoc}
+     * @param algorithm the selected Signature {@link Algorithm}
+     * @param challengeHash the result of {@link net.adamcin.sshkey.api.Challenge#getHashBytes()}
+     * @return
+     */
+    public byte[] sign(Algorithm algorithm, byte[] challengeHash) {
         return identity.getSignature(challengeHash);
     }
 
