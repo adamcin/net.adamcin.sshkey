@@ -58,7 +58,6 @@
         <module>bouncycastle</module>
         <module>jsch</module>
         <module>clientauth</module>
-        <module>clitool</module>
     </modules>
 
     <properties>
