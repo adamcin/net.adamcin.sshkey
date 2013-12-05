@@ -42,7 +42,7 @@ public final class Constants {
     /**
      * Identifier for the Signature Authentication scheme
      */
-    public static final String SCHEME = "Signature";
+    public static final String SCHEME = "SSHKey";
 
     /**
      * Http response header representing a server authentication challenge
