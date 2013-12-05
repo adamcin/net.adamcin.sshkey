@@ -29,13 +29,15 @@ package net.adamcin.sshkey.api;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Constant values used by the SSHKey Specification
  */
 public final class Constants {
-
 
     /**
      * Identifier for the Signature Authentication scheme
@@ -56,7 +58,7 @@ public final class Constants {
     /**
      * Parameter name for challenge-selected SSH Public Key Fingerprint
      */
-    public static final String FINGERPRINT = "fingerprint";
+    public static final String FINGERPRINT = "keyId";
 
     /**
      * Parameter name for challenge-provided nonce
@@ -70,6 +72,16 @@ public final class Constants {
     public static final String AUTHORIZATION = "Authorization";
 
     /**
+     * Parameter name for the "token" authorization parameter
+     */
+    public static final String TOKEN = "token";
+
+    /**
+     * Parameter name for the "signature" authorization parameter
+     */
+    public static final String SIGNATURE = "signature";
+
+    /**
      * Http Host header
      */
     public static final String HOST = "Host";
@@ -78,6 +90,16 @@ public final class Constants {
      * Http User-Agent header
      */
     public static final String USER_AGENT = "User-Agent";
+
+    /**
+     * Challenge header "algorithms" parameter
+     */
+    public static final String ALGORITHMS = "algorithms";
+
+    /**
+     * Challenge header "algorithm" parameter
+     */
+    public static final String ALGORITHM = "algorithm";
 
     /**
      * SSHKey Login ID header
@@ -98,6 +120,31 @@ public final class Constants {
      *
      */
     public static final Charset CHARSET_LOGIN_ID = Charset.forName("UTF-8");
+
+    /**
+     *
+     */
+    public static final Pattern RFC2617_PARAM = Pattern.compile("(^|\\s)(\\w+)=\"([^\"]*)\"");
+
+    public static final Map<String, String> parseRFC2617(String header) {
+        Map<String, String> params = new HashMap<String, String>();
+        final Matcher matcher = RFC2617_PARAM.matcher(header);
+        while (matcher.find()) {
+            params.put(matcher.group(2), matcher.group(3));
+        }
+        return Collections.unmodifiableMap(params);
+    }
+
+    public static final String constructRFC2617(Map<String, String> params) {
+        StringBuilder sb = new StringBuilder(SCHEME);
+        if (params != null && !params.isEmpty()) {
+            for (Map.Entry<String, String> param : params.entrySet()) {
+                sb.append(" ").append(param.getKey()).append("=\"").append(param.getValue()).append("\"").append(",");
+            }
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        return sb.toString();
+    }
 
     /**
      * Checks the provided fingerprint for lexical conformance

@@ -38,6 +38,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -80,7 +82,7 @@ public final class JCEKey implements Key {
     }
 
     public Set<Algorithm> getAlgorithms() {
-        return keyFormat.getSignatureAlgorithms();
+        return Collections.unmodifiableSet(new LinkedHashSet<Algorithm>(keyFormat.getSignatureAlgorithms()));
     }
 
     /**
@@ -119,6 +121,7 @@ public final class JCEKey implements Key {
      * {@inheritDoc}
      */
     public byte[] sign(Algorithm algorithm, byte[] challengeHash) {
+        LOGGER.warn("[sign] algo={}", algorithm);
         if (challengeHash == null) {
             throw new IllegalArgumentException("challengeHash cannot be null.");
         }
@@ -132,6 +135,7 @@ public final class JCEKey implements Key {
         if (signature != null) {
             try {
                 signature.initSign(keyPair.getPrivate());
+                LOGGER.warn("[sign] signature={}", signature == null ? "null" : signature.getClass().getName());
                 signature.update(challengeHash);
                 return signature.sign();
             } catch (SignatureException e) {

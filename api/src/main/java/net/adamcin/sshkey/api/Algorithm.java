@@ -28,11 +28,7 @@
 package net.adamcin.sshkey.api;
 
 /**
- * Created with IntelliJ IDEA.
- * User: madamcin
- * Date: 11/24/13
- * Time: 1:42 PM
- * To change this template use File | Settings | File Templates.
+ *
  */
 public enum Algorithm {
     RSA_SHA1("rsa-sha1"),
@@ -64,5 +60,4 @@ public enum Algorithm {
 
         return null;
     }
-
 }

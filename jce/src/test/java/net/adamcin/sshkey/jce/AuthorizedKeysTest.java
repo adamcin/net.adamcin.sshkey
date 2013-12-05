@@ -11,6 +11,8 @@ import net.adamcin.sshkey.jce.AuthorizedKeys.*;
 import net.adamcin.sshkey.testutil.KeyTestUtil;
 import net.adamcin.sshkey.api.DefaultKeychain;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.security.KeyPair;
@@ -25,6 +27,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class AuthorizedKeysTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizedKeysTest.class);
 
     private static final String TEST_AUTHORIZED_KEY = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC+Fz0pqK+XoCcukPhnPD+M1zb+FImbh5Lu3pkfW5DM67B6Hr9Q28LuWgNTfLqUn9o01W0TYzXDxtKG9psGuQ0wFJmqYJNbP6eRB3gimcr+C/eyy7N/evs8E36iMi7Si1piPd7QJ5l3D/tThI5cAACHYN0uqwphpXt4Lw2OZxIAQw== dummy@nowhere";
 
@@ -62,6 +65,7 @@ public class AuthorizedKeysTest {
 
     public void compareAuthorizedKeyToKeyPair(String parentName, String keyName, KeyFormat format) {
         final String id = "[" + parentName + "/" + keyName + "] ";
+        LOGGER.info("[compareAuthorizedKeyToKeyPair {}] begin", id);
 
         try {
             List<AuthorizedKey> keys = AuthorizedKeys.parseAuthorizedKeys(
@@ -137,10 +141,13 @@ public class AuthorizedKeysTest {
             final String sessionId = "session";
             final String fingerprint = jceKey.getId();
 
-            Challenge challenge = new Challenge(realm, fingerprint, sessionId, host, userAgent);
+            LOGGER.info("[compareAuthorizedKeyToKeyPair {}] before challenge", id);
+            Challenge challenge = new Challenge(realm, fingerprint, sessionId, host, userAgent, format.getSignatureAlgorithms());
 
+            LOGGER.info("[compareAuthorizedKeyToKeyPair {}] before authorization", id);
             Authorization authorization = signer.sign(challenge);
 
+            LOGGER.info("[compareAuthorizedKeyToKeyPair {}] before verification", id);
             assertTrue(id + "same key verifier should verify", sameKeyVerifier.verify(challenge, authorization));
             assertTrue(id + "public key verifier should verify", publicKeyVerifier.verify(challenge, authorization));
 

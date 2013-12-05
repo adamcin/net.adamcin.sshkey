@@ -26,6 +26,11 @@ public interface Keychain {
     Set<String> fingerprints();
 
     /**
+     * @return a {@link Set} containing the union of all algorithms supported by each {@link Key} in this {@link Keychain}
+     */
+    Set<Algorithm> algorithms();
+
+    /**
      * @return a reference to a {@link Keychain} which excludes the current {@link Key}.
      */
     Keychain discard();

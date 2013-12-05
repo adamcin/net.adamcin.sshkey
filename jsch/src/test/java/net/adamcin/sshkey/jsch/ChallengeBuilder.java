@@ -27,7 +27,12 @@
 
 package net.adamcin.sshkey.jsch;
 
+import net.adamcin.sshkey.api.Algorithm;
 import net.adamcin.sshkey.api.Challenge;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -49,7 +54,9 @@ public final class ChallengeBuilder {
         this.userAgent = userAgent;
     }
 
-    public Challenge build(String fingerprint) {
-        return new Challenge(realm, fingerprint, nonce, host, userAgent);
+    public Challenge build(String fingerprint, Collection<Algorithm> algorithms) {
+        return new Challenge(realm, fingerprint, nonce, host, userAgent, Arrays.asList(
+                algorithms.toArray(new Algorithm[algorithms.size()])
+        ));
     }
 }

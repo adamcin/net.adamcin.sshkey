@@ -83,7 +83,7 @@ public final class SSHDSSSignature extends Signature {
 
     @Override
     protected void engineUpdate(byte[] b, int off, int len) throws SignatureException {
-        this.update(b, off, len);
+        this.wrapped.update(b, off, len);
     }
 
     @Override

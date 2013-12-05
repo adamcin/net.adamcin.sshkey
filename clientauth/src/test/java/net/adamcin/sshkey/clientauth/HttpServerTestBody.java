@@ -164,6 +164,7 @@ public abstract class HttpServerTestBody extends TestBody {
             if (authHeader == null || authHeader.length() == 0) {
                 return null;
             } else {
+                LOGGER.info("[getLogin] authorization={}", authHeader);
                 return Authorization.parse(authHeader);
             }
         }
@@ -183,7 +184,7 @@ public abstract class HttpServerTestBody extends TestBody {
                                     Constants.CHARSET
                             )
                     );
-                    Challenge challenge = new Challenge(REALM, fingerprint, nonce, host, userAgent);
+                    Challenge challenge = new Challenge(REALM, fingerprint, nonce, host, userAgent, verifier.getKeychain().algorithms());
                     LOGGER.debug("[createChallenge] challenge: {}", challenge);
                     synchronized (this.sessions) {
                         this.sessions.put(nonce, challenge);

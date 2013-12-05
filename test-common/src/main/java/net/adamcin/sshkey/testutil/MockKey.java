@@ -27,8 +27,13 @@
 
 package net.adamcin.sshkey.testutil;
 
+import net.adamcin.sshkey.api.Algorithm;
 import net.adamcin.sshkey.api.Constants;
 import net.adamcin.sshkey.api.Key;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MockKey implements Key {
 
@@ -42,15 +47,21 @@ public class MockKey implements Key {
         return fingerprint;
     }
 
-    public boolean verify(byte[] challengeHash, byte[] signatureBytes) {
+    public boolean verify(Algorithm algorithm, byte[] challengeHash, byte[] signatureBytes) {
         return new StringBuilder(new String(signatureBytes, Constants.CHARSET)).reverse().toString().equals(new String(challengeHash, Constants.CHARSET));
     }
 
-    public byte[] sign(byte[] challengeHash) {
-        return sign(challengeHash);
+    public byte[] sign(Algorithm algorithm, byte[] challengeHash) {
+        return mockSign(challengeHash);
     }
 
     public static byte[] mockSign(byte[] challengeHash) {
-        return new StringBuilder(new String(challengeHash, Constants.CHARSET)).reverse().toString().getBytes(Constants.CHARSET);
+        return new StringBuilder(new String(challengeHash, Constants.CHARSET)).reverse().toString().getBytes(
+                Constants.CHARSET
+        );
+    }
+
+    public Set<Algorithm> getAlgorithms() {
+        return new HashSet<Algorithm>(Arrays.asList(Algorithm.values()));
     }
 }

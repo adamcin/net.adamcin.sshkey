@@ -1,10 +1,14 @@
 package net.adamcin.sshkey.api;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -13,7 +17,8 @@ import java.util.Set;
  */
 public class DefaultKeychain implements Keychain, Collection<Key> {
 
-    private final Map<String, Key> _identities = new HashMap<String, Key>();
+    private final Map<String, Key> _identities = new LinkedHashMap<String, Key>();
+    private final Set<Algorithm> _algorithms = new LinkedHashSet<Algorithm>();
 
     public DefaultKeychain() {
     }
@@ -24,6 +29,10 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
 
     public Set<String> fingerprints() {
         return Collections.unmodifiableSet(_identities.keySet());
+    }
+
+    public Set<Algorithm> algorithms() {
+        return Collections.unmodifiableSet(_algorithms);
     }
 
     public int size() {
@@ -54,6 +63,7 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
         if (key == null || _identities.containsKey(key.getId())) {
             return false;
         } else {
+            _algorithms.addAll(key.getAlgorithms());
             return _identities.put(key.getId(), key) != null;
         }
     }
@@ -90,6 +100,7 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
 
     public void clear() {
         _identities.clear();
+        _algorithms.clear();
     }
 
     public boolean contains(String fingerprint) {
@@ -98,5 +109,30 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
 
     public Key get(String fingerprint) {
         return _identities.get(fingerprint);
+    }
+
+    public Keychain discard() {
+        if (isEmpty()) {
+            throw new NoSuchElementException("keychain is empty");
+        } else if (size() > 1) {
+            List<Key> _keys = new ArrayList<Key>(_identities.size() - 1);
+            Iterator<Key> _idents = iterator();
+            _idents.next();
+            while (_idents.hasNext()) {
+                _keys.add(_idents.next());
+            }
+
+            return new DefaultKeychain(_keys);
+        } else {
+            return new DefaultKeychain();
+        }
+    }
+
+    public Key get() {
+        if (isEmpty()) {
+            throw new NoSuchElementException("keychain is empty");
+        } else {
+            return iterator().next();
+        }
     }
 }

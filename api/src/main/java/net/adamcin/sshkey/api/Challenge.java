@@ -28,35 +28,39 @@
 package net.adamcin.sshkey.api;
 
 import java.io.Serializable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Representation of the "WWW-Authenticate: SSHKey ..." authentication challenge header sent by the server.
+ * Representation of the "WWW-Authenticate: Signature ..." authentication challenge header sent by the server.
  */
 public final class Challenge implements Serializable {
     private static final String CRLF = "\r\n";
-    private static final String RFC2617_PARAM = "=\"([^\"]*)\"";
-    private static final Pattern REALM_PATTERN = Pattern.compile(Constants.REALM + RFC2617_PARAM);
-    private static final Pattern FINGERPRINT_PATTERN = Pattern.compile(Constants.FINGERPRINT + RFC2617_PARAM);
-    private static final Pattern NONCE_MATCHER = Pattern.compile(Constants.NONCE + RFC2617_PARAM);
 
     private final String realm;
     private final String fingerprint;
     private final String nonce;
     private final String host;
     private final String userAgent;
+    private final List<Algorithm> algorithms;
 
     public Challenge(final String realm,
                      final String fingerprint,
                      final String nonce,
                      final String host,
-                     final String userAgent) {
+                     final String userAgent,
+                     final Collection<Algorithm> algorithms) {
         this.realm = realm;
         this.fingerprint = fingerprint;
         this.nonce = nonce;
         this.host = host != null ? host : "";
         this.userAgent = userAgent != null ? userAgent : "";
+        this.algorithms = algorithms != null ? Arrays.asList(algorithms.toArray(new Algorithm[algorithms.size()])) : Collections.<Algorithm>emptyList();
     }
 
     public String getRealm() {
@@ -79,6 +83,10 @@ public final class Challenge implements Serializable {
         return userAgent;
     }
 
+    public List<Algorithm> getAlgorithms() {
+        return algorithms;
+    }
+
     public String getHash() {
         return new StringBuilder(host).append(CRLF)
                 .append(realm).append(CRLF)
@@ -91,12 +99,24 @@ public final class Challenge implements Serializable {
     }
 
     public String getHeaderValue() {
-        return String.format(
-                "%s " + Constants.REALM + "=\"%s\", "
-                        + Constants.FINGERPRINT + "=\"%s\", "
-                        + Constants.NONCE + "=\"%s\"",
-                Constants.SCHEME, this.realm, this.fingerprint, this.nonce
-        );
+        Map<String, String> params = new LinkedHashMap<String, String>();
+        params.put(Constants.REALM, this.realm);
+        params.put(Constants.FINGERPRINT, this.fingerprint);
+        params.put(Constants.NONCE, this.nonce);
+        params.put(Constants.ALGORITHMS, this.getAlgorithmsString());
+        return Constants.constructRFC2617(params);
+    }
+
+    public String getAlgorithmsString() {
+        if (algorithms == null || algorithms.isEmpty()) {
+            return "";
+        } else {
+            StringBuilder _algos = new StringBuilder();
+            for (Algorithm algo : algorithms) {
+                _algos.append(algo.getName()).append(" ");
+            }
+            return _algos.toString();
+        }
     }
 
     @Override
@@ -104,16 +124,32 @@ public final class Challenge implements Serializable {
         return getHeaderValue();
     }
 
-    public static Challenge parseChallenge(final String challenge, final String host, final String userAgent) {
-        Matcher realmMatcher = REALM_PATTERN.matcher(challenge);
-        Matcher fingerprintMatcher = FINGERPRINT_PATTERN.matcher(challenge);
-        Matcher nonceMatcher = NONCE_MATCHER.matcher(challenge);
+    public static List<Algorithm> parseAlgorithms(String algorithms) {
+        if (algorithms == null || algorithms.trim().isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            List<Algorithm> algorithmList = new ArrayList<Algorithm>();
+            String[] _algorithms = algorithms.trim().split("\\s+");
+            for (String _algo : _algorithms) {
+                Algorithm algorithm = Algorithm.forName(_algo);
+                if (algorithm != null) {
+                    algorithmList.add(algorithm);
+                }
+            }
+            return Collections.unmodifiableList(algorithmList);
+        }
+    }
 
-        if (realmMatcher.find() && fingerprintMatcher.find() && nonceMatcher.find()) {
-            String realm = realmMatcher.group(1);
-            String fingerprint = fingerprintMatcher.group(1);
-            String nonce = nonceMatcher.group(1);
-            return new Challenge(realm, fingerprint, nonce, host, userAgent);
+    public static Challenge parseChallenge(final String challenge, final String host, final String userAgent) {
+        Map<String, String> params = Constants.parseRFC2617(challenge);
+
+        if (params.containsKey(Constants.REALM) && params.containsKey(Constants.FINGERPRINT)
+                && params.containsKey(Constants.NONCE) && params.containsKey(Constants.ALGORITHMS)) {
+            String realm = params.get(Constants.REALM);
+            String fingerprint = params.get(Constants.FINGERPRINT);
+            String nonce = params.get(Constants.NONCE);
+            String algorithms = params.get(Constants.ALGORITHMS);
+            return new Challenge(realm, fingerprint, nonce, host, userAgent, parseAlgorithms(algorithms));
         }
 
         return null;

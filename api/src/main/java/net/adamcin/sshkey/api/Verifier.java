@@ -77,6 +77,10 @@ public final class Verifier {
         }
 
         Key key = keychain.get(challenge.getFingerprint());
-        return key != null && key.verify(challenge.getHashBytes(), authorization.getSignatureBytes());
+        if (key.getAlgorithms().contains(authorization.getAlgorithm())) {
+            return key != null && key.verify(authorization.getAlgorithm(), challenge.getHashBytes(), authorization.getSignatureBytes());
+        } else {
+            return false;
+        }
     }
 }

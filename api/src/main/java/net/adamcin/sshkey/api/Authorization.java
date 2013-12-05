@@ -28,6 +28,8 @@
 package net.adamcin.sshkey.api;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Representation of the "Authorization: SSHKey ..." header sent by the client in response to a {@link Challenge}
@@ -36,15 +38,18 @@ public final class Authorization implements Serializable {
 
     private final String token;
     private final String signature;
+    private final Algorithm algorithm;
 
-    public Authorization(final String token, final String signature) {
+    public Authorization(final String token, final String signature, final Algorithm algorithm) {
         this.token = token;
         this.signature = signature;
+        this.algorithm = algorithm;
     }
 
-    public Authorization(String token, byte[] signatureBytes) {
+    public Authorization(String token, byte[] signatureBytes, final Algorithm algorithm) {
         this.token = token;
         this.signature = Base64.toBase64String(signatureBytes);
+        this.algorithm = algorithm;
     }
 
     public String getToken() {
@@ -65,8 +70,16 @@ public final class Authorization implements Serializable {
         return Base64.fromBase64String(this.signature);
     }
 
+    public Algorithm getAlgorithm() {
+        return algorithm;
+    }
+
     public String getHeaderValue() {
-        return Constants.SCHEME + " " + token + " " + signature;
+        Map<String, String> params = new LinkedHashMap<String, String>();
+        params.put(Constants.TOKEN, token);
+        params.put(Constants.SIGNATURE, signature);
+        params.put(Constants.ALGORITHM, algorithm.getName());
+        return Constants.constructRFC2617(params);
     }
 
     @Override
@@ -79,15 +92,18 @@ public final class Authorization implements Serializable {
             return null;
         }
 
-        String[] parts = header.split(" ");
+        Map<String, String> params = Constants.parseRFC2617(header);
 
-        if (parts.length != 3 && !Constants.SCHEME.equals(parts[0])) {
+        if (params.containsKey(Constants.TOKEN) && params.containsKey(Constants.SIGNATURE)
+                && params.containsKey(Constants.ALGORITHM)) {
+
+            String token = params.get(Constants.TOKEN);
+            String signature = params.get(Constants.SIGNATURE);
+            String algorithm = params.get(Constants.ALGORITHM);
+
+            return new Authorization(token, signature, Algorithm.forName(algorithm));
+        } else {
             return null;
         }
-
-        String token = parts[1];
-        String signature = parts[2];
-
-        return new Authorization(token, signature);
     }
 }

@@ -55,7 +55,7 @@ public class JschIdentityTest {
         Verifier dverifier = AuthorizedKeys.newVerifier(KeyTestUtil.getPublicKeyAsFile(parentName, keyName));
         String fingerprint = dverifier.getKeychain().fingerprints().iterator().next();
 
-        Challenge challenge = challengeBuilder.build(fingerprint);
+        Challenge challenge = challengeBuilder.build(fingerprint, format.getSignatureAlgorithms());
 
         JSch jSchSigner = new JSch();
 

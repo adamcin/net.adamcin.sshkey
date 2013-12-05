@@ -33,13 +33,14 @@ public final class Http4SSHKeyAuthScheme extends RFC2617Scheme {
             Signer signer = ((SignerCredentials) credentials).getSigner();
             String fingerprint = this.getParameter(Constants.FINGERPRINT);
             String nonce = this.getParameter(Constants.NONCE);
+            String algorithms = this.getParameter(Constants.ALGORITHMS);
 
             Header hostHeader = request.getFirstHeader(Constants.HOST);
             Header userAgentHeader = request.getFirstHeader(Constants.USER_AGENT);
             String host = hostHeader != null ? hostHeader.getValue() : "";
             String userAgent = userAgentHeader != null ? userAgentHeader.getValue() : "";
 
-            Challenge challenge = new Challenge(this.getRealm(), fingerprint, nonce, host, userAgent);
+            Challenge challenge = new Challenge(this.getRealm(), fingerprint, nonce, host, userAgent, Challenge.parseAlgorithms(algorithms));
 
             Authorization authorization = signer.sign(challenge);
             if (authorization != null) {

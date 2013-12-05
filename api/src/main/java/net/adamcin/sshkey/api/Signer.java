@@ -30,6 +30,7 @@ package net.adamcin.sshkey.api;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Instance of a Signer, used by an HTTP client to sign a {@link Challenge} and create an {@link Authorization}
@@ -75,12 +76,19 @@ public final class Signer {
         if (challenge != null) {
 
             Key key = this.keychain.get(challenge.getFingerprint());
+            Algorithm algo = null;
+            for (Algorithm algorithm : challenge.getAlgorithms()) {
+                if (key.getAlgorithms().contains(algorithm)) {
+                    algo = algorithm;
+                    break;
+                }
+            }
 
             if (key != null) {
-                byte[] signature = key.sign(challenge.getHashBytes());
+                byte[] signature = key.sign(algo, challenge.getHashBytes());
 
                 if (signature != null) {
-                    return new Authorization(challenge.getNonce(), signature);
+                    return new Authorization(challenge.getNonce(), signature, algo);
                 }
             }
         }

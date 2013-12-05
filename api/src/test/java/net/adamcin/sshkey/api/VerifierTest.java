@@ -30,6 +30,8 @@ package net.adamcin.sshkey.api;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 public class VerifierTest {
@@ -43,8 +45,10 @@ public class VerifierTest {
 
         Keychain identities = new MockKeychain(fingerprint);
         Verifier v = new Verifier(identities);
-        Challenge c = new Challenge(VerifierTest.class.getName(), fingerprint, sessionId, host, userAgent);
-        Authorization a = new Authorization(c.getNonce(), MockKey.mockSign(c.getHashBytes()));
+        Challenge c = new Challenge(VerifierTest.class.getName(), fingerprint, sessionId, host, userAgent, Arrays.asList(
+                Algorithm.SSH_RSA
+        ));
+        Authorization a = new Authorization(c.getNonce(), MockKey.mockSign(c.getHashBytes()), Algorithm.SSH_RSA);
 
         assertTrue("default verifier should verify mock signature ", v.verify(c, a));
     }

@@ -34,4 +34,20 @@ public class MockKeychain implements Keychain {
     public Set<String> fingerprints() {
         return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(mockIdentity.getId())));
     }
+
+    public Set<Algorithm> algorithms() {
+        return mockIdentity != null ? mockIdentity.getAlgorithms() : Collections.<Algorithm>emptySet();
+    }
+
+    public Keychain discard() {
+        return new DefaultKeychain();
+    }
+
+    public Key get() {
+        return this.mockIdentity;
+    }
+
+    public boolean isEmpty() {
+        return this.mockIdentity != null;
+    }
 }

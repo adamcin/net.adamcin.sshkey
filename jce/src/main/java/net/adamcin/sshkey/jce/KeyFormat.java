@@ -38,6 +38,7 @@ import java.security.Signature;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -47,27 +48,24 @@ public enum KeyFormat {
 
     SSH_DSS(
             "ssh-dss", "DSA", FingerprintGenerator.DSA, Algorithm.SSH_DSS,
-            Collections.unmodifiableSet(new HashSet<Algorithm>(Arrays.asList(Algorithm.SSH_DSS, Algorithm.DSA_SHA1)))
+            Arrays.asList(Algorithm.SSH_DSS, Algorithm.DSA_SHA1)
     ),
     SSH_RSA(
-            "ssh-rsa", "RSA", FingerprintGenerator.RSA, Algorithm.SSH_RSA, Collections.unmodifiableSet(
-            new HashSet<Algorithm>(
+            "ssh-rsa", "RSA", FingerprintGenerator.RSA, Algorithm.SSH_RSA,
                     Arrays.asList(Algorithm.SSH_RSA, Algorithm.RSA_SHA1, Algorithm.RSA_SHA256, Algorithm.RSA_SHA512)
-            )
-    )
     ),
-    UNKOWN("_unknown_", "_unknown_", FingerprintGenerator.NOP, null, Collections.<Algorithm>emptySet());
+    UNKOWN("_unknown_", "_unknown_", FingerprintGenerator.NOP, null, Collections.<Algorithm>emptyList());
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyFormat.class);
 
     private final String identifier;
     private final String keyAlgorithm;
     private final Algorithm defaultSignature;
-    private final Set<Algorithm> signatureAlgorithms;
+    private final List<Algorithm> signatureAlgorithms;
     private final FingerprintGenerator fingerprintGenerator;
 
     private KeyFormat(String identifier, String keyAlgorithm, FingerprintGenerator fingerprintGenerator,
-                      Algorithm defaultSignature, Set<Algorithm> signatureAlgorithms) {
+                      Algorithm defaultSignature, List<Algorithm> signatureAlgorithms) {
         this.identifier = identifier;
         this.keyAlgorithm = keyAlgorithm;
         this.fingerprintGenerator = fingerprintGenerator;
@@ -94,7 +92,7 @@ public enum KeyFormat {
         return null;
     }
 
-    public Set<Algorithm> getSignatureAlgorithms() {
+    public List<Algorithm> getSignatureAlgorithms() {
         return signatureAlgorithms;
     }
 

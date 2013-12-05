@@ -33,13 +33,14 @@ public final class Http3SSHKeyAuthScheme extends RFC2617Scheme {
             SignerCredentials creds = (SignerCredentials) credentials;
             String fingerprint = this.getParameter(Constants.FINGERPRINT);
             String sessionId = this.getParameter(Constants.NONCE);
+            String algorithms = this.getParameter(Constants.ALGORITHMS);
 
             Header hostHeader = method.getRequestHeader(Constants.HOST);
             Header userAgentHeader = method.getRequestHeader(Constants.USER_AGENT);
             String host = hostHeader != null ? hostHeader.getValue() : "";
             String userAgent = userAgentHeader != null ? userAgentHeader.getValue() : "";
 
-            Challenge challenge = new Challenge(this.getRealm(), fingerprint, sessionId, host, userAgent);
+            Challenge challenge = new Challenge(this.getRealm(), fingerprint, sessionId, host, userAgent, Challenge.parseAlgorithms(algorithms));
 
             Signer signer = creds.getSigner();
             if (signer != null) {
