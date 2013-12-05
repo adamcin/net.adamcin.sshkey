@@ -3,7 +3,6 @@ net.adamcin.sshkey.bouncycastle
 net.adamcin.sshkey.clientauth.async
 net.adamcin.sshkey.clientauth.http3
 net.adamcin.sshkey.clientauth.http4
-net.adamcin.sshkey.clitool
 net.adamcin.sshkey.jce
 net.adamcin.sshkey.jsch
 net.adamcin.sshkey.testutil
