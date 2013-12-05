@@ -76,15 +76,17 @@ public final class Signer {
         if (challenge != null) {
 
             Key key = this.keychain.get(challenge.getFingerprint());
-            Algorithm algo = null;
-            for (Algorithm algorithm : challenge.getAlgorithms()) {
-                if (key.getAlgorithms().contains(algorithm)) {
-                    algo = algorithm;
-                    break;
-                }
-            }
 
             if (key != null) {
+
+                Algorithm algo = null;
+                for (Algorithm algorithm : challenge.getAlgorithms()) {
+                    if (key.getAlgorithms().contains(algorithm)) {
+                        algo = algorithm;
+                        break;
+                    }
+                }
+
                 byte[] signature = key.sign(algo, challenge.getHashBytes());
 
                 if (signature != null) {

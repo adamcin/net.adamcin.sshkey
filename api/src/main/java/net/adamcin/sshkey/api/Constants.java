@@ -58,7 +58,7 @@ public final class Constants {
     /**
      * Parameter name for challenge-selected SSH Public Key Fingerprint
      */
-    public static final String FINGERPRINT = "keyId";
+    public static final String FINGERPRINT = "keyid";
 
     /**
      * Parameter name for challenge-provided nonce
