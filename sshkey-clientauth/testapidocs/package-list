@@ -1,0 +1,4 @@
+net.adamcin.sshkey.clientauth
+net.adamcin.sshkey.clientauth.async
+net.adamcin.sshkey.clientauth.http3
+net.adamcin.sshkey.clientauth.http4
